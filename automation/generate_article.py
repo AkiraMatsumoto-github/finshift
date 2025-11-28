@@ -64,6 +64,34 @@ def parse_schedule_date(schedule_str):
     # Convert to ISO 8601 format
     return dt.strftime("%Y-%m-%dT%H:%M:%S")
 
+def save_to_file(title, content, keyword):
+    import os
+    
+    output_dir = os.path.join(os.path.dirname(__file__), "generated_articles")
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+        
+    date_str = datetime.now().strftime("%Y-%m-%d")
+    safe_keyword = re.sub(r'[\\/*?:\"<>| ]', '_', keyword)
+    filename = f"{date_str}_{safe_keyword}.md"
+    filepath = os.path.join(output_dir, filename)
+    
+    file_content = f"""---
+title: {title}
+date: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+keyword: {keyword}
+---
+
+{content}
+"""
+    
+    try:
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(file_content)
+        print(f"Saved local copy to: {filepath}")
+    except Exception as e:
+        print(f"Warning: Failed to save local file: {e}")
+
 def main():
     parser = argparse.ArgumentParser(description="Generate and post an article to WordPress.")
     parser.add_argument("--keyword", required=True, help="Keyword for the article")
@@ -94,6 +122,9 @@ def main():
     
     print(f"Generated Title: {title}")
     print(f"Content Length: {len(content)} chars")
+    
+    # Save to Local File
+    save_to_file(title, content, args.keyword)
     
     if args.dry_run:
         print("Dry run mode. Skipping WordPress posting.")
