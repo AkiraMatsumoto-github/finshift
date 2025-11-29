@@ -61,6 +61,44 @@ class WordPressClient:
             if hasattr(e, 'response') and e.response is not None:
                 print(f"Response content: {e.response.text}")
             return None
+            return None
+
+    def get_category_id(self, slug):
+        """Get category ID by slug."""
+        try:
+            # Use query param format for default permalink structure
+            url = f"{self.wp_url}/?rest_route=/wp/v2/categories&slug={slug}"
+            response = requests.get(url, auth=self.auth)
+            response.raise_for_status()
+            data = response.json()
+            if data:
+                return data[0]['id']
+            return None
+        except Exception as e:
+            print(f"Error fetching category {slug}: {e}")
+            return None
+
+    def get_tag_id(self, slug):
+        """Get tag ID by slug. Creates tag if not exists."""
+        try:
+            # Try to get existing tag
+            url = f"{self.wp_url}/?rest_route=/wp/v2/tags&slug={slug}"
+            response = requests.get(url, auth=self.auth)
+            response.raise_for_status()
+            data = response.json()
+            if data:
+                return data[0]['id']
+            
+            # Create if not exists
+            create_url = f"{self.api_url}/tags"
+            create_data = {"name": slug, "slug": slug}
+            response = requests.post(create_url, json=create_data, auth=self.auth)
+            response.raise_for_status()
+            return response.json()['id']
+            
+        except Exception as e:
+            print(f"Error fetching/creating tag {slug}: {e}")
+            return None
 
 if __name__ == "__main__":
     # Test connection

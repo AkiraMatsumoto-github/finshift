@@ -101,6 +101,12 @@ def main():
     # 3. Generation
     print("\n=== Step 3: Generation ===")
     count = 0
+    
+    # Calculate schedule times (next day at 10:00, 14:00, 18:00)
+    from datetime import datetime, timedelta
+    schedule_times = ["10:00", "14:00", "18:00"]
+    next_day = datetime.now() + timedelta(days=1)
+    
     for article in high_score_articles:
         if count >= args.limit:
             break
@@ -118,14 +124,21 @@ def main():
         # We use the title as the keyword for generation
         keyword = f"{article['title']}について"
         
+        # Calculate schedule time
+        schedule_time_str = schedule_times[count % len(schedule_times)]
+        schedule_datetime = f"{next_day.strftime('%Y-%m-%d')} {schedule_time_str}"
+        
         cmd = [
             "python", os.path.join(base_dir, "generate_article.py"),
             "--keyword", keyword,
-            "--type", article_type
+            "--type", article_type,
+            "--schedule", schedule_datetime
         ]
         
         if args.dry_run:
             cmd.append("--dry-run")
+        
+        print(f"Scheduled for: {schedule_datetime}")
             
         subprocess.run(cmd)
         count += 1

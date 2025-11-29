@@ -6,37 +6,28 @@ from datetime import datetime
 try:
     from automation.gemini_client import GeminiClient
     from automation.wp_client import WordPressClient
+    from automation.classifier import ArticleClassifier
 except ImportError:
     from gemini_client import GeminiClient
     from wp_client import WordPressClient
+    from classifier import ArticleClassifier
 
 def parse_article_content(text):
     """
     Parse the generated text to extract title and content.
-    Assumes format:
-    タイトル: [Title]
-    
-    [Content]
+    Extracts the first Markdown heading (# Title) as the title.
     """
     lines = text.split('\n')
     title = "無題"
     content_start_index = 0
     
     for i, line in enumerate(lines):
-        # Match "タイトル:", "**タイトル**:", "# タイトル" etc.
         clean_line = line.strip()
-        # Remove markdown bold/heading chars for checking
-        check_line = clean_line.replace("*", "").replace("#", "").strip()
         
-        if check_line.startswith("タイトル:") or check_line.startswith("タイトル："):
-            # Extract title content
-            if ":" in clean_line:
-                title = clean_line.split(":", 1)[1].strip()
-            elif "：" in clean_line:
-                title = clean_line.split("：", 1)[1].strip()
-            
-            # Clean up markdown from title
-            title = title.replace("**", "").strip()
+        # Check if line starts with # (Markdown heading)
+        if clean_line.startswith('#'):
+            # Extract title by removing # and whitespace
+            title = clean_line.lstrip('#').strip()
             content_start_index = i + 1
             break
             
@@ -130,12 +121,28 @@ def main():
     except ImportError:
         from automation.seo_optimizer import SEOOptimizer
     
-    seo = SEOOptimizer()
-    meta_description = seo.generate_meta_description(title, content, args.keyword)
-    print(f"Meta Description: {meta_description}")
+    # 3. Classify Content
+    print("Classifying content...")
+    category_id = None
+    tag_ids = []
     
-    # 4. Save to Local File
-    save_to_file(title, content, args.keyword)
+    try:
+        classifier = ArticleClassifier()
+        classification = classifier.classify_article(title, content[:1000])
+        print(f"Classification Result: {classification}")
+        
+        # Resolve IDs if not dry-run (or even in dry-run if we want to test lookup, but let's skip for speed)
+        # Actually, let's resolve them to verify logic if we have a client.
+        # But we initialize wp_client later. Let's initialize it earlier if needed.
+        # Or just do it in the posting block.
+        # Let's do it here if we want to print them in dry run?
+        # No, let's keep it simple. Just pass the classification dict to the posting block?
+        # No, create_post expects IDs.
+        # Let's initialize WP client here if we are going to post.
+        
+    except Exception as e:
+        print(f"Classification failed: {e}")
+        classification = {}
 
     if args.dry_run:
         print("Dry run mode. Skipping WordPress posting.")
@@ -147,6 +154,23 @@ def main():
     print("Posting to WordPress...")
     try:
         wp = WordPressClient()
+        
+        # Resolve Categories and Tags
+        if classification:
+            cat_slug = classification.get("category")
+            if cat_slug:
+                cat_id = wp.get_category_id(cat_slug)
+                if cat_id:
+                    category_id = [cat_id]
+                    print(f"Resolved Category: {cat_slug} -> {cat_id}")
+            
+            t_slugs = classification.get("industry_tags", []) + classification.get("theme_tags", [])
+            for t_slug in t_slugs:
+                t_id = wp.get_tag_id(t_slug)
+                if t_id:
+                    tag_ids.append(t_id)
+            print(f"Resolved Tags: {t_slugs} -> {tag_ids}")
+
         # Convert Markdown to HTML
         html_content = markdown.markdown(content, extensions=['extra', 'nl2br'])
         
@@ -168,7 +192,8 @@ def main():
             content=html_content, 
             status=status,
             date=schedule_date,
-            excerpt=meta_description  # Use excerpt for meta description
+            categories=category_id,
+            tags=tag_ids
         )
         
         if result:
