@@ -244,18 +244,19 @@ LogiShift視点: {context['logishift_angle']}
             ## タイトル生成ルール
             - **文字数**: 32文字前後（最大40文字以内）
             - **キーワード配置**: ターゲットキーワード「{keyword}」を可能な限り冒頭に配置
-            - **独自性**: 速報性、影響範囲を含める
-            - **パワーワード**: 【速報】【注目】【最新】などを適宜使用
+            - **独自性**: 影響範囲や具体的な内容を含める
+            - **パワーワード**: 【注目】【最新】【解説】などを適宜使用
             
             ## タイトルテンプレート（以下のいずれかの形式で生成）
-            1. 【速報】{keyword}｜物流業界への影響を解説
+            1. {keyword}｜物流業界への影響を解説
             2. {keyword}が物流を変える？最新トレンドを分析
             3. 注目の{keyword}｜[業界/企業]の動向まとめ
             
-            例: 【速報】物流2024年問題｜運送業界への影響と対策を徹底解説
+            例: 物流2024年問題｜運送業界への影響と対策を徹底解説
             ## 注意点
             - 信頼感を与えるため自分から物流エバンジェリストですと名乗らないこと
             """,
+
             
             "global": f"""
             {context_section}あなたは物流業界の海外トレンドウォッチャーです。以下のキーワードに関連する海外の最新事例やトレンドを紹介する記事を執筆してください。
@@ -326,12 +327,12 @@ LogiShift視点: {context['logishift_angle']}
 
     def generate_image(self, prompt, output_path, aspect_ratio="16:9"):
         """
-        Generate an image using Imagen 3.0.
+        Generate an image using Imagen 3.0 (Vertex AI) or Gemini 2.5 Flash Image (API Key fallback).
         """
         try:
+            # Try Imagen 3.0 first (Vertex AI only)
             print(f"Generating image with Imagen 3.0 for prompt: {prompt}")
             
-            # google-genai implementation
             response = self._retry_request(
                 self.client.models.generate_images,
                 model='imagen-3.0-generate-001',
@@ -341,23 +342,62 @@ LogiShift視点: {context['logishift_angle']}
                 }
             )
             
-            # Extract image from response
+            # Extract image from response (Imagen 3.0)
             if response.generated_images:
                 image_bytes = response.generated_images[0].image.image_bytes
-                
                 with open(output_path, 'wb') as f:
                     f.write(image_bytes)
                 print(f"Image saved to: {output_path}")
                 return output_path
             
-            print("No image generated in response.")
-            return None
-                
         except Exception as e:
-            print(f"Failed to generate image: {e}")
-            import traceback
-            traceback.print_exc()
-            return None
+            error_str = str(e).lower()
+            # If Imagen 3.0 is not available, fallback to Gemini 2.5 Flash Image
+            if '404' in error_str or 'not found' in error_str or 'unauthenticated' in error_str:
+                print(f"Imagen 3.0 not available ({e}), falling back to Gemini 2.5 Flash Image...")
+                
+                try:
+                    # Use google-generativeai SDK for API Key support
+                    import google.generativeai as genai_v1
+                    genai_v1.configure(api_key=self.api_key)
+                    
+                    model = genai_v1.GenerativeModel('gemini-2.5-flash-image')
+                    
+                    # Explicitly ask for image in prompt
+                    content_prompt = f"Generate a photorealistic image of: {prompt}"
+                    
+                    print(f"Generating image with Gemini 2.5 Flash Image...")
+                    response = model.generate_content(content_prompt)
+                    
+                    # Extract image from response (Gemini 2.5 Flash)
+                    if response.parts:
+                        for part in response.parts:
+                            # Check if part has inline_data (image)
+                            # Note: The attribute might be different depending on SDK version
+                            # Usually it's inline_data or similar
+                            if hasattr(part, 'inline_data') and part.inline_data:
+                                image_bytes = part.inline_data.data
+                                with open(output_path, 'wb') as f:
+                                    f.write(image_bytes)
+                                print(f"Image saved to: {output_path}")
+                                return output_path
+                            
+                            # Also check candidates[0].content.parts if response.parts is empty or text
+                            # But usually response.parts iterates over candidates[0].content.parts
+                    
+                    # If we reached here, no image found in parts
+                    print("No image found in Gemini 2.5 response.")
+                    # print(response.text) # Debug
+                    
+                except Exception as e2:
+                    print(f"Failed to generate image with Gemini 2.5 Flash Image: {e2}")
+                    return None
+            else:
+                print(f"Failed to generate image: {e}")
+                return None
+        
+        return None
+
 
     def generate_image_prompt(self, title, content_summary, article_type="know"):
         """
