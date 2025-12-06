@@ -25,7 +25,11 @@ SOURCE_TYPE_MAPPING = {
     "logistics_mgmt": "global",
     "robot_report": "global",
     "supply_chain_brain": "global",
+    "supply_chain_brain": "global",
     "freightwaves": "global",
+    "robotics_automation_news": "global",
+    "36kr_japan": "global",
+    "pandaily": "global",
     
     # Domestic Sources
     "lnews": "news",

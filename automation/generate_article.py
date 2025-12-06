@@ -142,11 +142,29 @@ def main():
     
     # 3. Generate SEO Metadata
     print("Generating SEO metadata...")
-    try:
-        from seo_optimizer import SEOOptimizer
-    except ImportError:
-        from automation.seo_optimizer import SEOOptimizer
+    meta_desc = ""
+    optimized_title = title
     
+    try:
+        try:
+            from seo_optimizer import SEOOptimizer
+        except ImportError:
+            from automation.seo_optimizer import SEOOptimizer
+            
+        optimizer = SEOOptimizer()
+        
+        # Generate Meta Description
+        meta_desc = optimizer.generate_meta_description(title, content, args.keyword)
+        print(f"Meta Description: {meta_desc}")
+        
+        # Optimize Title
+        optimized_title = optimizer.optimize_title(title)
+        print(f"Original Title: {title}")
+        print(f"Optimized Title: {optimized_title}")
+        
+    except Exception as e:
+        print(f"Warning: SEO Optimization failed: {e}")
+
     # 2.5 Generate Hero Image
     # if gemini.use_vertex: # Allow for both Vertex and API Key
     print("Generating hero image...")
@@ -214,6 +232,8 @@ def main():
     if args.dry_run:
         print("Dry run mode. Skipping WordPress posting.")
         print("--- Preview ---")
+        print(f"Title: {optimized_title}")
+        print(f"Meta Description: {meta_desc}")
         print(content[:500] + "...")
         return
 
@@ -296,18 +316,28 @@ def main():
             schedule_date = None
             status = "draft"
         
+        # Prepare metadata for SEO plugins (Yoast/All in One SEO)
+        meta_fields = {}
+        if meta_desc:
+            meta_fields = {
+                "_yoast_wpseo_metadesc": meta_desc,
+                # "_aioseop_description": meta_desc # Uncomment if using AIOSEO
+            }
+
         result = wp.create_post(
-            title=title, 
+            title=optimized_title, 
             content=html_content, 
             status=status,
             date=schedule_date,
             categories=category_id,
             tags=tag_ids,
-            featured_media=featured_media_id
+            featured_media=featured_media_id,
+            excerpt=meta_desc,
+            meta=meta_fields
         )
         
         if result:
-            print(f"Successfully created draft post. ID: {result.get('id')}")
+            print(f"Successfully created post. ID: {result.get('id')}")
             print(f"Link: {result.get('link')}")
         else:
             print("Failed to create post.")

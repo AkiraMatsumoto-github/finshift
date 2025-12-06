@@ -49,7 +49,7 @@ class SEOOptimizer:
 """
         
         try:
-            response = self.gemini.model.generate_content(prompt)
+            response = self.gemini.generate_content(prompt)
             meta_desc = response.text.strip()
             
             # Ensure length is within bounds
