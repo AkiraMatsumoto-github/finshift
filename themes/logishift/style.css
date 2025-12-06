@@ -1126,12 +1126,30 @@ section {
     background-color: var(--color-white);
     box-shadow: var(--shadow-sm);
     border-radius: 8px;
-    overflow: hidden;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .entry-content table thead {
     background: var(--gradient-primary);
     color: var(--color-white);
+}
+
+.entry-content table td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border-gray);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    white-space: normal;
+    min-width: 180px;
+    /* Standard width for content columns to prevent excessive wrapping */
+}
+
+/* First column is usually a label/key, so it can be narrower */
+.entry-content table td:first-child,
+.entry-content table th:first-child {
+    min-width: 100px;
 }
 
 .entry-content table th {
@@ -1140,13 +1158,8 @@ section {
     font-weight: 700;
     font-size: 0.95rem;
     letter-spacing: 0.02em;
-}
-
-.entry-content table td {
-    padding: var(--spacing-md);
-    border-bottom: 1px solid var(--color-border-gray);
-    font-size: 0.95rem;
-    line-height: 1.6;
+    white-space: nowrap;
+    /* Keep headers on one line to set natural column width */
 }
 
 .entry-content table tbody tr:last-child td {
@@ -1167,19 +1180,13 @@ section {
     background-color: rgba(0, 180, 216, 0.08);
 }
 
-/* Responsive Tables */
+/* Responsive Tables: Default style now handles scrolling, but we can adjust padding if needed */
 @media (max-width: 768px) {
-    .entry-content table {
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
 
     .entry-content table th,
     .entry-content table td {
         padding: var(--spacing-sm);
         font-size: 0.85rem;
-        white-space: nowrap;
     }
 }
 
@@ -1623,7 +1630,7 @@ section {
 
     /* Reduce container padding on single post pages for better readability */
     .single .container {
-        padding: 0 var(--spacing-sm);
+        padding: 0 var(--spacing-md);
     }
 
     /* Fix Tag List "Card in Card" Look */
