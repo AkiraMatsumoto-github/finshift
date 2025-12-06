@@ -140,6 +140,43 @@ class WordPressClient:
             print(f"Error fetching/creating tag {slug}: {e}")
             return None
 
+    def get_posts(self, limit=10, category=None, tag=None, status="publish"):
+        """
+        Retrieve recent posts from WordPress.
+        
+        Args:
+            limit: Number of posts to retrieve (default: 10)
+            category: Filter by category ID (int)
+            tag: Filter by tag ID (int)
+            status: Filter by post status (default: "publish")
+            
+        Returns:
+            List of posts (dict) or None if error
+        """
+        try:
+            url = f"{self.api_url}/posts"
+            params = {
+                "per_page": limit,
+                "status": status,
+                "orderby": "date",
+                "order": "desc"
+            }
+            
+            if category:
+                params["categories"] = category
+            if tag:
+                params["tags"] = tag
+                
+            response = requests.get(url, params=params, auth=self.auth)
+            response.raise_for_status()
+            return response.json()
+            
+        except Exception as e:
+            print(f"Error fetching posts: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Response content: {e.response.text}")
+            return None
+
     def upload_media(self, file_path, alt_text=""):
         """
         Upload a media file to WordPress.

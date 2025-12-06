@@ -139,6 +139,22 @@ python automation/generate_article.py --keyword "AGV" --type buy
 python automation/generate_article.py --keyword "2024年問題" --schedule "2025-12-10 10:00"
 ```
 
+#### 内部リンク自動提案機能 (Internal Link Suggester)
+新規記事生成時に、既存のWordPress記事から関連性の高いものを自動抽出し、内部リンクとして埋め込む機能です。
+
+- **仕組み**:
+  1. WordPressから既存記事を取得（`InternalLinkSuggester`）
+  2. Geminiが新規記事のテーマと既存記事の関連度をスコアリング
+  3. 関連度の高い記事の”抜粋”を執筆プロンプトに追加指示として注入し、自然な形でリンク設置
+
+- **設定（読み込み記事数）**:
+  現在、参照する既存記事数は **最新50件** に設定されています。
+  変更する場合は `automation/generate_article.py` の以下の箇所を修正してください：
+  ```python
+  # automation/generate_article.py
+  candidates = linker.fetch_candidates(limit=50)  # この数値を変更
+  ```
+
 **Phase 2: 収集 (`collector.py`)**
 ```bash
 # 全ソースから収集
@@ -188,6 +204,10 @@ GitHub Secrets (`Settings > Secrets`) を確認してください：
 - `SSH_PRIVATE_KEY`: (正しい秘密鍵か)
 
 ### ローカル開発
+#### 環境立ち上げ
+```bash
+source automation/venv/bin/activate   
+```
 
 #### Gemini API エラー (`GeminiClient` object has no attribute 'model')
 `seo_optimizer.py` で発生していましたが、修正済みです。現在は `self.gemini.generate_content()` を使用しています。

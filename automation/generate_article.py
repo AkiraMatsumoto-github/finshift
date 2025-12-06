@@ -8,11 +8,13 @@ try:
     from automation.gemini_client import GeminiClient
     from automation.wp_client import WordPressClient
     from automation.classifier import ArticleClassifier
+    from automation.internal_linker import InternalLinkSuggester
 except ImportError:
     import gemini_client
     from gemini_client import GeminiClient
     from wp_client import WordPressClient
     from classifier import ArticleClassifier
+    from internal_linker import InternalLinkSuggester
 
 def parse_article_content(text):
     """
@@ -104,12 +106,28 @@ def main():
     print(f"Starting article generation for keyword: {args.keyword} (Type: {args.type})")
     
     # 1. Initialize Clients
+    wp_client = None
     try:
         gemini = GeminiClient()
-        if not args.dry_run:
-            wp = WordPressClient()
-        else:
-            wp = None
+        # Initialize WP client for reading (linking) even in dry-run
+        try:
+            from wp_client import WordPressClient # Ensure class is available if not imported top-level
+        except ImportError:
+            pass # Already imported
+            
+        try:
+            wp_client = WordPressClient()
+            print("WordPress Client initialized (for reading/linking).")
+        except Exception as e:
+            print(f"Warning: WordPress Client initialization failed: {e}. Internal linking will be skipped.")
+            
+        if not args.dry_run and wp_client is None:
+             print("Error: WordPress credentials required for non-dry-run mode.")
+             sys.exit(1)
+            
+        # Assign to 'wp' for compatibility (though we use wp_client now)
+        wp = wp_client
+             
     except Exception as e:
         print(f"Failed to initialize Gemini Client: {e}")
         sys.exit(1)
@@ -127,9 +145,54 @@ def main():
     else:
         print("Keyword-based generation mode")
     
+    # 1.5 Internal Linking Suggestions
+    extra_instructions = None
+    if wp_client:
+        try:
+            print("--- Internal Link Suggester ---")
+            linker = InternalLinkSuggester(wp_client, gemini)
+            # Limit to 50 for performance during generation
+            candidates = linker.fetch_candidates(limit=50) 
+            
+            if candidates:
+                # Simple context for scoring
+                scoring_context = f"Keyword: {args.keyword}\nType: {args.type}"
+                if context:
+                    scoring_context += f"\nSummary: {context.get('summary', '')}"
+                    
+                relevant_links = linker.score_relevance(args.keyword, scoring_context, candidates)
+                
+                if relevant_links:
+                    print(f"Found {len(relevant_links)} relevant articles for linking.")
+                    
+                    # Build instructions
+                    links_text = "\n".join([f"- ID: {l['id']} | Title: {l['title']} | URL: {l['url']}" for l in relevant_links])
+                    extra_instructions = f"""
+## Internal Linking Instructions
+You have access to the following existing articles on the blog. 
+Select the most relevant ones (if any) and include them in the article using standard Markdown link syntax: [Title](URL).
+
+[Existing Articles List]
+{links_text}
+
+[Rules]
+1. PRIORITIZE specific, high-relevance articles.
+2. Format options:
+   - Inline: ... as discussed in [Topic Name](URL)...
+   - Block: See also: [Title](URL) at the end of sections.
+3. If no article is strictly relevant, do not force a link.
+"""
+                else:
+                    print("No relevant internal links found.")
+            else:
+                 print("No existing articles found for linking candidates.")
+                 
+        except Exception as e:
+            print(f"Warning: Internal linking failed: {e}")
+
     # 2. Generate Content
     print("Generating content with Gemini...")
-    generated_text = gemini.generate_article(args.keyword, article_type=args.type, context=context)
+    generated_text = gemini.generate_article(args.keyword, article_type=args.type, context=context, extra_instructions=extra_instructions)
     
     if not generated_text:
         print("Failed to generate content.")
@@ -319,10 +382,21 @@ def main():
         # Prepare metadata for SEO plugins (Yoast/All in One SEO)
         meta_fields = {}
         if meta_desc:
-            meta_fields = {
-                "_yoast_wpseo_metadesc": meta_desc,
-                # "_aioseop_description": meta_desc # Uncomment if using AIOSEO
-            }
+            meta_fields["_yoast_wpseo_metadesc"] = meta_desc
+            # meta_fields["_aioseop_description"] = meta_desc # Uncomment if using AIOSEO
+
+        # 4. Generate AI Structured Summary (New)
+        print("Generating AI Structured Summary...")
+        # Strip HTML for efficient token usage
+        text_content_for_summary = re.sub('<[^<]+?>', '', content)
+        structured_summary = gemini.generate_structured_summary(text_content_for_summary)
+        
+        if structured_summary:
+            import json
+            meta_fields["ai_structured_summary"] = json.dumps(structured_summary, ensure_ascii=False)
+            print("  - Structured summary generated and added to meta.")
+        else:
+            print("  - Warning: Failed to generate structured summary.")
 
         result = wp.create_post(
             title=optimized_title, 
