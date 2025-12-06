@@ -62,7 +62,6 @@ get_header();
 									<span class="posted-on"><?php echo get_the_date(); ?></span>
 								</div>
 								<h3 class="featured-title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h3>
-								<div class="featured-excerpt"><?php echo wp_trim_words( get_the_excerpt(), 30 ); ?></div>
 							</div>
 						</article>
 						<?php

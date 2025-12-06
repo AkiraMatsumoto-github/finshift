@@ -1256,11 +1256,7 @@ section {
     color: var(--color-tech-blue);
 }
 
-.featured-excerpt {
-    color: var(--color-medium-gray);
-    font-size: 0.95rem;
-    line-height: 1.7;
-}
+
 
 /* Category Sections */
 .category-section {
