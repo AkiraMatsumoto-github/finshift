@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os
 import base64
 from google import genai
@@ -33,6 +34,7 @@ class GeminiClient:
                 self.client = genai.Client(api_key=self.api_key)
             else:
                 raise ValueError("Missing Gemini credentials. Set GOOGLE_CLOUD_PROJECT/LOCATION or GEMINI_API_KEY in .env")
+
     def _retry_request(self, func, *args, **kwargs):
         """
         Retry a function call with exponential backoff if a quota error occurs.
@@ -74,41 +76,30 @@ class GeminiClient:
             print(f"Error generating content: {e}")
             return None
 
-    def generate_article(self, keyword, article_type="know", context=None):
+    def generate_article(self, keyword, article_type="know", context=None, extra_instructions=None):
         """
-        Generate an article based on the keyword and content type.
-        
-        Args:
-            keyword: Target keyword
-            article_type: 'know' (default), 'buy', 'do', 'news', 'global'
-            context: Optional context dict with keys: summary, key_facts, logishift_angle
+        Generate a full blog article in Markdown format based on the keyword and type.
         """
+        print(f"Generating article for keyword: {keyword} (Type: {article_type})")
         
-        # Create context section if provided (for News/Global articles)
+        context_section = ""
         if context:
             context_section = f"""
-【参考情報】
-以下の元記事の情報を基に、LogiShift読者向けの記事を作成してください。
-事実関係(数値、固有名詞、主張)は正確に反映してください。
-
-要約: {context['summary']}
-重要な事実: {', '.join(context['key_facts'])}
-LogiShift視点: {context['logishift_angle']}
-
-"""
-            print("Using context for article generation")
-        else:
-            context_section = ""
-            print("Generating from keyword only")
-        
+            ## Context Information
+            The following external information is relevant to the topic. Use it to ensure accuracy and freshness.
+            Summary: {context.get('summary', '')}
+            Key Facts: {', '.join(context.get('key_facts', []))}
+            """
+            
         prompts = {
             "know": f"""
-            あなたは物流業界のDXエバンジェリストです。以下のキーワードについて、基礎から分かりやすく解説する記事を執筆してください。
+            {context_section}あなたは物流業界の専門家です。以下のキーワードについて、読者の疑問を解決する解説記事を執筆してください。
             
             キーワード: {keyword}
             
             ## ターゲット
-            - 物流担当者、倉庫管理者（基礎知識を求めている）
+            - 物流業界の初心者〜中級者
+            - ツール導入を検討している経営層、IT担当者
             
             ## 構成案
             1. **導入**: 読者の課題に共感し、なぜこのキーワードが重要なのかを提示
@@ -256,7 +247,6 @@ LogiShift視点: {context['logishift_angle']}
             ## 注意点
             - 信頼感を与えるため自分から物流エバンジェリストですと名乗らないこと
             """,
-
             
             "global": f"""
             {context_section}あなたは物流業界の海外トレンドウォッチャーです。以下のキーワードに関連する海外の最新事例やトレンドを紹介する記事を執筆してください。
@@ -297,6 +287,9 @@ LogiShift視点: {context['logishift_angle']}
         }
         
         prompt = prompts.get(article_type, prompts["know"])
+        
+        if extra_instructions:
+            prompt += f"\n\n{extra_instructions}\n"
         
         # Add common formatting instruction
         prompt += """
@@ -427,7 +420,7 @@ LogiShift視点: {context['logishift_angle']}
         2. Is specific and descriptive (not abstract)
         3. Focuses on logistics/warehouse/supply chain context
         4. Is photorealistic and professional
-        5. Avoids text, people's faces, or complex diagrams
+        5. Avoids text, human faces, or complex diagrams
         
         Article Title: {title}
         Article Type: {article_type}
@@ -616,6 +609,41 @@ LogiShift視点: {context['logishift_angle']}
             print(f"Error generating static page: {e}")
             return None
 
+
+    def generate_structured_summary(self, content):
+        """
+        Generate a structured JSON summary of the article for internal linking relevance.
+        """
+        prompt = f"""
+        You are an expert content analyst. Analyze the following article and generate a structured summary in JSON format.
+        This summary will be used by an AI system to identify relevant internal links.
+
+        Article Content:
+        {content[:4000]}... (truncated)
+
+        Output JSON format (Strictly JSON only):
+        {{
+            "summary": "Detailed summary of the article content (300-500 chars). Mention specific methods, technologies, or case studies discussed.",
+            "key_topics": ["list", "of", "specific", "sub-topics", "covered"],
+            "target_audience": ["primary", "target", "audience"],
+            "entities": ["list", "of", "companies", "products", "or", "tools", "mentioned"]
+        }}
+        """
+        
+        try:
+            response = self._retry_request(
+                self.client.models.generate_content,
+                model='gemini-2.5-flash',
+                contents=prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
+            )
+            import json
+            return json.loads(response.text)
+        except Exception as e:
+            print(f"Structured summary generation failed: {e}")
+            return None
 
 if __name__ == "__main__":
     # Test generation

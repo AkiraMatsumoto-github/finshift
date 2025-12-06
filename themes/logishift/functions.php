@@ -289,3 +289,17 @@ function logishift_sanitize_post_slug( $slug, $post_ID, $post_status, $post_type
     return $slug;
 }
 add_filter( 'wp_unique_post_slug', 'logishift_sanitize_post_slug', 10, 4 );
+
+/**
+ * Register custom meta fields for REST API.
+ * This exposes the AI structured summary to the API.
+ */
+function logishift_register_meta() {
+    register_post_meta( 'post', 'ai_structured_summary', array(
+        'show_in_rest' => true,
+        'single'       => true,
+        'type'         => 'string',
+        'auth_callback' => '__return_true'
+    ) );
+}
+add_action( 'init', 'logishift_register_meta' );
