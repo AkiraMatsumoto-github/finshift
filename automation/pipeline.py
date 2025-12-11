@@ -113,10 +113,7 @@ def main():
     print("\n=== Step 3: Generation ===")
     count = 0
     
-    # Calculate schedule times (next day at 10:00, 14:00, 18:00)
-    from datetime import datetime, timedelta
-    schedule_times = ["10:00", "14:00", "18:00"]
-    next_day = datetime.now() + timedelta(days=1)
+    # Schedule logic removed - defaulting to immediate publish
     
     # Initialize Classifier
     classifier = ArticleClassifier()
@@ -138,16 +135,11 @@ def main():
         # Generate keyword
         keyword = f"{article['title']}について"
         
-        # Calculate schedule time
-        schedule_time_str = schedule_times[count % len(schedule_times)]
-        schedule_datetime = f"{next_day.strftime('%Y-%m-%d')} {schedule_time_str}"
-        
         # Base command
         cmd = [
             "python", os.path.join(base_dir, "generate_article.py"),
             "--keyword", keyword,
-            "--type", article_type,
-            "--schedule", schedule_datetime
+            "--type", article_type
         ]
         
         # News/Global articles: Context-based generation (URL reading + summarization)
@@ -177,7 +169,8 @@ def main():
         if args.dry_run:
             cmd.append("--dry-run")
         
-        print(f"Scheduled for: {schedule_datetime}")
+        # print(f"Scheduled for: {schedule_datetime}")
+
             
         subprocess.run(cmd)
         count += 1

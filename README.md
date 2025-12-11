@@ -181,6 +181,11 @@ python automation/generate_static_pages.py --all
 
 ### サーバー運用
 
+#### gcloud 認証ができてない
+```bash 
+gcloud auth login
+```
+
 #### パーミッションエラーでテーマが反映されない
 ```bash
 ssh -p 10022 xs937213@sv16718.xserver.jp
