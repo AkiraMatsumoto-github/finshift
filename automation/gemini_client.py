@@ -7,6 +7,8 @@ from google.genai import types
 from dotenv import load_dotenv
 import time
 import random
+import textwrap
+
 
 load_dotenv(override=True)
 
@@ -93,7 +95,7 @@ class GeminiClient:
             """
             
         prompts = {
-            "know": f"""
+            "know": textwrap.dedent(f"""
             {context_section}あなたは物流業界の専門家（SEOコンテンツライター）です。
             以下のキーワードについて、読者の検索意図（インサイト）を深く満たす解説記事を執筆してください。
             
@@ -144,9 +146,9 @@ class GeminiClient:
             ## 注意点
             - 信頼感を与えるため自分から物流エバンジェリストですと名乗らないこと
             - **HTMLタグ（<br>, <p>, <div>など）は絶対に使用しないこと** 
-            """,
+            """),
             
-            "buy": f"""
+            "buy": textwrap.dedent(f"""
             あなたは物流業界のDXコンサルタントです。
             以下のキーワードに関連するソリューションの「失敗しない選び方」と比較記事を執筆してください。
             
@@ -192,9 +194,9 @@ class GeminiClient:
             ## 注意点
             - 信頼感を与えるため自分から物流エバンジェリストですと名乗らないこと
             - **HTMLタグ（<br>, <p>, <div>など）は絶対に使用しないこと** 
-            """,
+            """),
             
-            "do": f"""
+            "do": textwrap.dedent(f"""
             あなたは物流業界のDXエバンジェリストです。以下のキーワードに関連する具体的な事例やノウハウ記事を執筆してください。
             
             キーワード: {keyword}
@@ -233,9 +235,9 @@ class GeminiClient:
             
             ## 注意点   
             - 信頼感を与えるため自分から物流エバンジェリストですと名乗らないこと
-            """,
+            """),
             
-            "news": f"""
+            "news": textwrap.dedent(f"""
             {context_section}あなたは物流業界のニュースコメンテーターであり、SEOコンテンツライターです。
             以下のキーワードに関するニュースやトレンドを、読者（物流関係者）の関心に強く訴求するように解説してください。
             
@@ -285,9 +287,9 @@ class GeminiClient:
             これらの要素を組み合わせ、そのニュースやトピックに最も適した、クリックしたくなるタイトルを生成してください。
             ## 注意点
             - 信頼感を与えるため自分から物流エバンジェリストですと名乗らないこと
-            """,
+            """),
             
-            "global": f"""
+            "global": textwrap.dedent(f"""
             {context_section}あなたは物流業界の海外トレンドウォッチャー（SEOライター）です。
             以下のキーワードに関連する海外の最新事例やトレンドを、日本の物流企業が参考にできる形で解説してください。
             
@@ -334,9 +336,9 @@ class GeminiClient:
             上記のヒントを参考に、ターゲット読者の好奇心を刺激するタイトルを作成してください。「〜について解説」という表現は避け、具体的で魅力的な言葉を選んでください。
             ## 注意点
             - 信頼感を与えるため自分から物流エバンジェリストですと名乗らないこと
-            """,
+            """),
 
-            "weekly_summary": f"""
+            "weekly_summary": textwrap.dedent(f"""
             {context_section}あなたは物流業界の専門メディア「LogiShift」の編集長です。
             今週公開された以下の記事（タイトルと要約）をもとに、業界の動きを構造化・抽象化し、深い示唆（インサイト）を提供する「週間サマリー」を作成してください。
             
@@ -379,7 +381,7 @@ class GeminiClient:
             ## タイトル生成ルール
             - **フォーマット**: 【週間サマリー】MM/DD〜MM/DD｜[今週の最大の潮流・抽象化したテーマ]
             - **例**: 【週間サマリー】12/13〜12/20｜「点」のDXから「線」の連携へ、物流構造改革の胎動
-            """
+            """)
         }
         
         prompt = prompts.get(article_type, prompts["know"])
@@ -388,7 +390,8 @@ class GeminiClient:
             prompt += f"\n\n{extra_instructions}\n"
         
         # Add common formatting instruction
-        prompt += """
+        # Add common formatting instruction
+        prompt += textwrap.dedent("""
         
         ## 出力形式
         必ず以下の形式で出力してください：
@@ -425,7 +428,7 @@ class GeminiClient:
         ### WMSの主な機能
         
         ...
-        """
+        """)
         
         try:
             response = self._retry_request(
@@ -518,7 +521,7 @@ class GeminiClient:
         Returns:
             English image prompt optimized for Imagen 3.0
         """
-        prompt = f"""
+        prompt = textwrap.dedent(f"""
         You are an expert at creating image generation prompts for Imagen 3.0.
         
         Based on the following article information, create a detailed English image prompt that:
@@ -534,7 +537,7 @@ class GeminiClient:
         
         Generate a single, detailed English image prompt (max 100 words) that would create a compelling hero image for this article.
         Output ONLY the prompt text, no explanations.
-        """
+        """)
         
         try:
             response = self._retry_request(
@@ -552,7 +555,7 @@ class GeminiClient:
         """
         Classify the article content into categories and tags.
         """
-        prompt = f"""
+        prompt = textwrap.dedent(f"""
         You are an expert content classifier for a logistics media site.
         Analyze the following article content and classify it.
 
@@ -565,7 +568,7 @@ class GeminiClient:
             "industry_tags": ["list", "of", "relevant", "industries", "e.g.", "manufacturing", "retail", "ecommerce", "3pl-warehouse", "transportation"],
             "theme_tags": ["list", "of", "relevant", "themes", "e.g.", "labor-shortage", "automation", "cost-reduction", "quality-improvement", "safety", "environment"]
         }}
-        """
+        """)
         
         try:
             response = self._retry_request(
@@ -595,7 +598,7 @@ class GeminiClient:
             Generated markdown content
         """
         prompts = {
-            "privacy": """
+            "privacy": textwrap.dedent("""
             あなたは法務に詳しいコンテンツライターです。
             以下の情報を基に、日本の個人情報保護法に準拠したプライバシーポリシーを作成してください。
             
@@ -628,9 +631,9 @@ class GeminiClient:
             - 専門用語は分かりやすく説明
             - ユーザーの権利を明確に記載
             - 連絡先を明記
-            """,
+            """),
             
-            "about": """
+            "about": textwrap.dedent("""
             あなたはコーポレートコミュニケーションの専門家です。
             以下の情報を基に、LogiShiftの運営者情報ページを作成してください。
             
@@ -666,9 +669,9 @@ class GeminiClient:
             - 基本情報はMarkdownテーブルで整理
             - 親しみやすく、信頼感のある文章
             - 物流業界への熱意が伝わる内容
-            """,
+            """),
             
-            "contact": """
+            "contact": textwrap.dedent("""
             あなたはカスタマーサポートの専門家です。
             以下の情報を基に、LogiShiftのお問い合わせページを作成してください。
             
@@ -697,7 +700,7 @@ class GeminiClient:
             - メールアドレスは必ず記載
             - 対応時間を明記
             - プライバシーポリシーへのリンクを案内（「詳しくは[プライバシーポリシー](/privacy-policy/)をご覧ください」）
-            """
+            """)
         }
         
         prompt = prompts.get(page_type)
@@ -720,7 +723,7 @@ class GeminiClient:
         """
         Generate a structured JSON summary of the article for internal linking relevance.
         """
-        prompt = f"""
+        prompt = textwrap.dedent(f"""
         You are an expert content analyst. Analyze the following article and generate a structured summary in JSON format.
         This summary will be used by an AI system to identify relevant internal links.
         IMPORTANT: The content is Japanese, so the 'summary' and 'key_topics' MUST be written in Japanese.
@@ -734,7 +737,7 @@ class GeminiClient:
             "key_topics": ["list", "of", "specific", "sub-topics", "covered", "(in Japanese)"],
             "entities": ["list", "of", "companies", "products", "or", "tools", "mentioned", "(preserve original names)"]
         }}
-        """
+        """)
         
         try:
             response = self._retry_request(
@@ -759,7 +762,7 @@ class GeminiClient:
         # Truncate content for efficiency
         truncated_content = content[:3000]
         
-        prompt = f"""
+        prompt = textwrap.dedent(f"""
         You are an expert social media manager for a logistics media site "LogiShift".
         Create an engaging X (Twitter) post content based on the following article.
         
@@ -791,7 +794,7 @@ class GeminiClient:
             "summary": "「もう手遅れ」と諦めるのは早い。現場がすぐ取り組める3つの即効策を公開。知らないと損する物流DXの最前線とは？",
             "hashtags": ["#LogiShift", "#Amazon", "#RFID", "#物流DX"]
         }}
-        """
+        """)
         
         try:
             response = self._retry_request(
