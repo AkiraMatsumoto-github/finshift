@@ -21,8 +21,9 @@ except ImportError:
     from automation.gemini_client import GeminiClient
 
 # Editorial Persona and Scoring Criteria
-SCORING_PROMPT = """あなたは物流業界のDXエバンジェリスト「LogiShift編集長」です。
-ターゲット読者である「物流倉庫の管理者」「3PL企業の経営層」にとって、以下の記事が有益かどうかを評価してください。
+# Editorial Persona and Scoring Criteria
+SHARED_CRITERIA = """あなたは物流業界のDXエバンジェリスト「LogiShift編集長」です。
+ターゲット読者である「物流倉庫の管理者」「3PL企業の経営層」にとって、以下の記事（または記事リスト）が有益かどうかを評価してください。
 
 【ターゲットペルソナ】
 - 属性: 物流現場の責任者、または経営層
@@ -30,7 +31,6 @@ SCORING_PROMPT = """あなたは物流業界のDXエバンジェリスト「Logi
 - 関心: 業界動向、効率化手法、他社の事例、最新技術（自動化・ロボット）
 
 【評価基準】（合計100点）
-
 1. **物流業界への関連性と影響** (0-35点)
    - 物流、サプライチェーン、倉庫管理に関連する内容か？
    - 業界に影響を与える、または参考になる情報か？
@@ -50,7 +50,9 @@ SCORING_PROMPT = """あなたは物流業界のDXエバンジェリスト「Logi
    - 最新の業界動向や注目すべきニュースか？
    - 大手企業や業界リーダーの動きか？
    - 市場トレンドや今後の展望に関する情報か？
+"""
 
+SCORING_PROMPT = SHARED_CRITERIA + """
 【記事情報】
 タイトル: {title}
 要約: {summary}
@@ -63,6 +65,22 @@ SCORING_PROMPT = """あなたは物流業界のDXエバンジェリスト「Logi
   "reasoning": "<評価理由をターゲット読者の視点で2-3文で簡潔に>",
   "relevance": "<high/medium/low>"
 }}
+"""
+
+BATCH_SCORING_PROMPT = SHARED_CRITERIA + """
+【記事リスト】
+{articles_text}
+
+【出力形式】
+以下のJSON配列形式のみで出力してください。Markdownコードブロックは不要です。
+[
+  {{
+    "id": <記事ID(整数)>,
+    "score": <0-100の整数>,
+    "reasoning": "<評価理由をターゲット読者の視点で2-3文で簡潔に>",
+    "relevance": "<high/medium/low>"
+  }}
+]
 """
 
 def score_article(article, model_name="gemini-3-pro-preview"):
@@ -126,6 +144,73 @@ def score_article(article, model_name="gemini-3-pro-preview"):
             "reasoning": f"Error: {str(e)}",
             "relevance": "error"
         }
+
+def score_articles_batch(articles, model_name="gemini-3-pro-preview"):
+    """Score a batch of articles using Gemini API."""
+    if not articles:
+        return []
+
+    try:
+        client = GeminiClient()
+    except Exception as e:
+        print(f"Error initializing GeminiClient: {e}", file=sys.stderr)
+        return []
+
+    articles_text = ""
+    for i, article in enumerate(articles):
+        # Assign a temporary ID for matching
+        articles_text += f"\nID: {i}\nタイトル: {article.get('title')}\n要約: {article.get('summary', 'なし')}\nソース: {article.get('source')}\n---\n"
+
+    prompt = BATCH_SCORING_PROMPT.format(articles_text=articles_text)
+
+    try:
+        response = client.generate_content(prompt, model=model_name)
+        
+        if not response:
+            raise Exception("No response from Gemini API")
+
+        result_text = response.text.strip()
+        
+        # Extract JSON from markdown code blocks if present
+        if "```json" in result_text:
+            result_text = result_text.split("```json")[1].split("```")[0].strip()
+        elif "```" in result_text:
+            result_text = result_text.split("```")[1].split("```")[0].strip()
+        
+        # Cleanup potential invalid JSON (sometimes ends with comma)
+        if result_text.endswith(","):
+             result_text = result_text[:-1]
+
+        results = json.loads(result_text)
+        
+        if not isinstance(results, list):
+            print(f"Error: Batch response is not a list: {results}", file=sys.stderr)
+            return []
+
+        # Map back to articles
+        scored_articles = []
+        for res in results:
+            idx = res.get('id')
+            if isinstance(idx, int) and 0 <= idx < len(articles):
+                original = articles[idx]
+                scored_articles.append({
+                    "title": original.get("title"),
+                    "url": original.get("url"),
+                    "source": original.get("source"),
+                    "summary": original.get("summary", ""),
+                    "score": res.get("score", 0),
+                    "reasoning": res.get("reasoning", ""),
+                    "relevance": res.get("relevance", "low")
+                })
+        
+        # Sort by index to maintain order? Or simply return what we got.
+        # It's safer to return a list of same length if possible, filling missing with 0 scores?
+        # For simplicity, let's just return what matched.
+        return scored_articles
+        
+    except Exception as e:
+        print(f"Error batch scoring: {e}", file=sys.stderr)
+        return []
 
 def main():
     parser = argparse.ArgumentParser(description="Score articles for relevance to LogiShift.")

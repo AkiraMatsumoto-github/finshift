@@ -68,7 +68,7 @@ def main():
     # Import modules directly
     sys.path.append(os.path.dirname(base_dir))
     from automation.collector import fetch_rss, DEFAULT_SOURCES
-    from automation.scorer import score_article
+    from automation.scorer import score_article, score_articles_batch
     from automation.url_reader import extract_content
     from automation.summarizer import summarize_article
     from automation.classifier import ArticleClassifier
@@ -100,10 +100,26 @@ def main():
         print(f"Limiting scoring to first {args.score_limit} articles.")
         articles_to_score = collected_articles[:args.score_limit]
     
-    for i, article in enumerate(articles_to_score):
-        print(f"[{i+1}/{len(articles_to_score)}] Scoring: {article['title'][:30]}...")
-        scored = score_article(article)
-        scored_articles.append(scored)
+    import time
+    batch_size = 10
+    print(f"Scoring in batches of {batch_size}...")
+    
+    for i in range(0, len(articles_to_score), batch_size):
+        batch = articles_to_score[i:i+batch_size]
+        print(f"[{i+1}-{min(i+batch_size, len(articles_to_score))}/{len(articles_to_score)}] Scoring batch...")
+        
+        batch_results = score_articles_batch(batch)
+        
+        if batch_results:
+            scored_articles.extend(batch_results)
+        else:
+            print("Warning: Batch failed or returned no results. Falling back to individual scoring...")
+            for article in batch:
+                print(f"  Fallback Scoring: {article['title'][:30]}...")
+                scored = score_article(article)
+                scored_articles.append(scored)
+                
+        time.sleep(2) # Rate limit protection
         
     # Filter
     high_score_articles = [a for a in scored_articles if a["score"] >= args.threshold]
