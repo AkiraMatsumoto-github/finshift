@@ -110,9 +110,6 @@ def phase_2_analysis(args):
     
     # Define Target Regions
     if args.region == "all":
-        # target_regions = ["US", "JP", "CN", "IN", "ID", "Crypto"]
-        target_regions = ["US"] # Start small for testing, or iterate all if confident.
-        # Let's iterate ALL as per design
         target_regions = ["US", "JP", "CN", "IN", "ID", "Crypto"]
     else:
         target_regions = [args.region]
