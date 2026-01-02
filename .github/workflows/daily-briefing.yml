@@ -1,0 +1,85 @@
+name: Daily Briefing Generation
+
+on:
+  schedule:
+    # 毎日 07:00 JST (前日 22:00 UTC)
+    - cron: '0 22 * * *'
+  workflow_dispatch:
+
+jobs:
+  generate-daily-briefing:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r automation/requirements.txt
+
+      # --- PHASE 1: Data Collection (Run Once) ---
+      # Collects News (All Regions), Market Data, Econ Calendar
+      - name: Collect All Data
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          GOOGLE_CLOUD_LOCATION: "global"
+        run: |
+          cd automation
+          python daily_briefing.py --region all --phase collect
+
+      # --- PHASE 2: Analysis & Generation (Sequential) ---
+      
+      # 1. US Briefing
+      - name: Generate Briefing (US)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          GOOGLE_CLOUD_LOCATION: "global"
+        run: |
+          cd automation
+          python daily_briefing.py --region US --phase analyze
+
+      # 2. Japan Briefing
+      - name: Generate Briefing (JP)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          GOOGLE_CLOUD_LOCATION: "global"
+        run: |
+          cd automation
+          python daily_briefing.py --region JP --phase analyze
+
+      # 3. Crypto Briefing
+      - name: Generate Briefing (Crypto)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          GOOGLE_CLOUD_LOCATION: "global"
+        run: |
+          cd automation
+          python daily_briefing.py --region Crypto --phase analyze
+
+      - name: Upload artifacts
+        if: success() || failure() # Upload what we have even if one step fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: daily-briefings
+          path: automation/generated_articles/*.md
+          retention-days: 7

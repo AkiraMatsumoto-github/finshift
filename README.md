@@ -111,15 +111,6 @@ ssh -p 10022 xs937213@sv16718.xserver.jp
 chmod -R 755 ~/finshift.net/public_html/wp-content/themes/finshift
 ```
 
-#### Automationスクリプトが動かない (依存関係)
-Miniconda環境の再構築が必要な場合があります。
-```bash
-ssh -p 10022 xs937213@sv16718.xserver.jp
-cd ~/logishift-automation/automation
-conda install -c conda-forge lxml -y
-pip install -r requirements.txt
-```
-
 #### GitHub Actions のデプロイ失敗
 GitHub Secrets (`Settings > Secrets`) を確認してください：
 - `SERVER_HOST`: sv16718.xserver.jp

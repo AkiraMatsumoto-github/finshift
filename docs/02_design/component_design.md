@@ -1,4 +1,4 @@
-# LogiShift 共通パーツ設計 (Component Design)
+# FinShift 共通パーツ設計 (Component Design)
 
 ## 1. ボタン (Buttons)
 

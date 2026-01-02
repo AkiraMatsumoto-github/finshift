@@ -1,6 +1,6 @@
-# Contributing to LogiShift
+# Contributing to FinShift
 
-LogiShiftプロジェクトへの貢献ありがとうございます。
+FinShiftプロジェクトへの貢献ありがとうございます。
 開発をスムーズに進めるため、以下のガイドラインに従ってください。
 
 ## ブランチ運用

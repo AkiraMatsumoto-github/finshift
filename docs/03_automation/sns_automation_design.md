@@ -1,7 +1,7 @@
 # SNS自動投稿 実装計画
 
 ## 目的
-LogiShiftで記事が公開された直後に、X (Twitter) および Threads へ自動投稿する仕組みを構築します。
+FinShiftで記事が公開された直後に、X (Twitter) および Threads へ自動投稿する仕組みを構築します。
 単純にリンクを貼るだけでなく、クリック率（CTR）を高めるための魅力的な要約やハッシュタグを含めて投稿します。
 
 ## 投稿フォーマット (X / Threads)
@@ -30,7 +30,7 @@ LogiShiftで記事が公開された直後に、X (Twitter) および Threads �
 
 #物流DX #AGV #自動化 #2024年問題
 
-https://logishift.net/automation-agv-guide/
+https://finshift.net/automation-agv-guide/
 ```
 
 ## アーキテクチャ

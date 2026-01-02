@@ -3,7 +3,7 @@
  * The template for displaying the front page
  * SEO-optimized design based on content_strategy.md
  *
- * @package LogiShift
+ * @package FinShift
  */
 
 get_header();

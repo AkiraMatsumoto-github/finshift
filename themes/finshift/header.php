@@ -2,7 +2,7 @@
 /**
  * The header for our theme
  *
- * @package LogiShift
+ * @package FinShift
  */
 ?>
 <!doctype html>
@@ -19,7 +19,7 @@
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
 <div id="page" class="site">
-	<a class="skip-link screen-reader-text" href="#primary"><?php esc_html_e( 'Skip to content', 'logishift' ); ?></a>
+	<a class="skip-link screen-reader-text" href="#primary"><?php esc_html_e( 'Skip to content', 'finshift' ); ?></a>
 
 	<header id="masthead" class="site-header">
 		<div class="container header-container">
@@ -45,10 +45,10 @@
 				endif;
 				?>
 				<?php
-				$logishift_description = get_bloginfo( 'description', 'display' );
-				if ( $logishift_description || is_customize_preview() ) :
+				$finshift_description = get_bloginfo( 'description', 'display' );
+				if ( $finshift_description || is_customize_preview() ) :
 					?>
-					<p class="site-description"><?php echo $logishift_description; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
+					<p class="site-description"><?php echo $finshift_description; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></p>
 				<?php endif; ?>
 			</div><!-- .site-branding -->
 
@@ -60,13 +60,12 @@
 					<span class="icon-bar"></span>
 				</button>
 				<ul id="primary-menu" class="menu">
-					<li><a href="<?php echo esc_url( home_url( '/category/market-analysis/' ) ); ?>">Market Analysis</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/us/' ) ); ?>">US Market</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/japan/' ) ); ?>">JP Market</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/india/' ) ); ?>">India</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/china/' ) ); ?>">China</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/india/' ) ); ?>">India</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/indonesia/' ) ); ?>">Indonesia</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/crypto/' ) ); ?>">Crypto</a></li>
-					<li><a href="<?php echo esc_url( home_url( '/forex/' ) ); ?>">FX</a></li>
 					<li><a href="<?php echo esc_url( home_url( '/category/investment-guide/' ) ); ?>">Guide</a></li>
 				</ul>
 			</nav><!-- #site-navigation -->

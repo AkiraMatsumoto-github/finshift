@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-URL Content Extractor for LogiShift
+URL Content Extractor for FinShift
 
 Extracts article content from URLs using BeautifulSoup.
 Supports major logistics news sources with fallback to Gemini URL reading.

@@ -1,7 +1,7 @@
 # Automation Python Scripts Overview
 
 `automation/` ディレクトリ内のPythonスクリプトの役割と機能についての解説です。
-FinShiftでは、Logishiftの既存資産（SEO最適化、WordPress連携など）を最大限活用しつつ、金融特化の「収集」と「分析」モジュールを拡張しています。
+FinShiftでは既存資産（SEO最適化、WordPress連携など）を最大限活用しつつ、金融特化の「収集」と「分析」モジュールを拡張しています。
 
 ## 🛠️ Data Collection (`automation/collectors/`)
 

@@ -1,4 +1,4 @@
-# LogiShift デザインガイドライン
+# FinShift デザインガイドライン
 
 ## 1. デザインコンセプト
 **「Reliable & Progressive (信頼と先進)」**

@@ -3,7 +3,7 @@
  * Template Name: Ranking Page
  * The template for displaying the ranking page
  *
- * @package LogiShift
+ * @package FinShift
  */
 
 get_header();
@@ -14,9 +14,9 @@ get_header();
 	<!-- Ranking Header -->
 	<section class="archive-hero">
 		<div class="container">
-			<h1 class="archive-title"><?php esc_html_e( '人気記事ランキング', 'logishift' ); ?></h1>
+			<h1 class="archive-title"><?php esc_html_e( '人気記事ランキング', 'finshift' ); ?></h1>
 			<div class="archive-description">
-				<?php esc_html_e( 'LogiShiftで最も読まれている記事をランキング形式でご紹介します。', 'logishift' ); ?>
+				<?php esc_html_e( 'FinShiftで最も読まれている記事をランキング形式でご紹介します。', 'finshift' ); ?>
 			</div>
 		</div>
 	</section>
@@ -27,16 +27,16 @@ get_header();
 			<!-- Time Period Tabs -->
 			<div class="region-filter-tabs ranking-tabs" style="justify-content: center; margin-bottom: 40px;">
 				<button class="region-tab active" data-period="7">
-					<?php esc_html_e( '7日間', 'logishift' ); ?>
+					<?php esc_html_e( '7日間', 'finshift' ); ?>
 				</button>
 				<button class="region-tab" data-period="14">
-					<?php esc_html_e( '14日間', 'logishift' ); ?>
+					<?php esc_html_e( '14日間', 'finshift' ); ?>
 				</button>
 				<button class="region-tab" data-period="30">
-					<?php esc_html_e( '30日間', 'logishift' ); ?>
+					<?php esc_html_e( '30日間', 'finshift' ); ?>
 				</button>
 				<button class="region-tab" data-period="60">
-					<?php esc_html_e( '60日間', 'logishift' ); ?>
+					<?php esc_html_e( '60日間', 'finshift' ); ?>
 				</button>
 			</div>
 

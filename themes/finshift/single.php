@@ -2,7 +2,7 @@
 /**
  * The template for displaying all single posts
  *
- * @package LogiShift
+ * @package FinShift
  */
 
 get_header();
@@ -82,7 +82,7 @@ get_header();
 
 							wp_link_pages(
 								array(
-									'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'logishift' ),
+									'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'finshift' ),
 									'after'  => '</div>',
 								)
 							);
@@ -104,7 +104,7 @@ get_header();
 
 					<!-- Related Posts -->
 					<div class="related-posts">
-						<h3 class="related-title"><?php esc_html_e( '関連記事', 'logishift' ); ?></h3>
+						<h3 class="related-title"><?php esc_html_e( '関連記事', 'finshift' ); ?></h3>
 						<div class="article-grid">
 							<?php
 							$related_args = array(
@@ -143,7 +143,7 @@ get_header();
 								endwhile;
 								wp_reset_postdata();
 							else :
-								echo '<p>' . esc_html__( '関連記事はありません。', 'logishift' ) . '</p>';
+								echo '<p>' . esc_html__( '関連記事はありません。', 'finshift' ) . '</p>';
 							endif;
 							?>
 						</div>

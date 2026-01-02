@@ -48,7 +48,7 @@ def run_command(command):
     return result.stdout
 
 def main():
-    parser = argparse.ArgumentParser(description="LogiShift Automation Pipeline")
+    parser = argparse.ArgumentParser(description="FinShift Automation Pipeline")
     parser.add_argument("--days", type=int, help="Days to look back for collection")
     parser.add_argument("--hours", type=int, help="Hours to look back for collection (overrides --days, default: 6)")
     parser.add_argument("--threshold", type=int, default=85, help="Score threshold for generation")

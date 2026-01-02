@@ -2,7 +2,7 @@
 /**
  * The template for displaying the footer
  *
- * @package LogiShift
+ * @package FinShift
  */
 ?>
 
@@ -21,11 +21,12 @@
 					<div class="footer-column">
 						<h3 class="footer-title">Markets</h3>
 						<ul class="footer-links">
-							<li><a href="<?php echo esc_url( home_url( '/category/market-analysis/' ) ); ?>">Market Analysis</a></li>
 							<li><a href="<?php echo esc_url( home_url( '/category/featured-news/' ) ); ?>">Featured News</a></li>
 							<li><a href="<?php echo esc_url( home_url( '/us/' ) ); ?>">US Market</a></li>
 							<li><a href="<?php echo esc_url( home_url( '/japan/' ) ); ?>">Japan Market</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/china/' ) ); ?>">China Market</a></li>
 							<li><a href="<?php echo esc_url( home_url( '/india/' ) ); ?>">India Market</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/indonesia/' ) ); ?>">Indonesia Market</a></li>
 						</ul>
 					</div>
 
@@ -34,7 +35,6 @@
 						<h3 class="footer-title">Assets & Guide</h3>
 						<ul class="footer-links">
 							<li><a href="<?php echo esc_url( home_url( '/crypto/' ) ); ?>">Crypto</a></li>
-							<li><a href="<?php echo esc_url( home_url( '/forex/' ) ); ?>">Forex</a></li>
 							<li><a href="<?php echo esc_url( home_url( '/tag/commodity/' ) ); ?>">Commodities</a></li>
 							<li><a href="<?php echo esc_url( home_url( '/category/investment-guide/' ) ); ?>">Investment Guide</a></li>
 						</ul>

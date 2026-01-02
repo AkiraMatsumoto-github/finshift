@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Batch Summarizer for LogiShift
+Batch Summarizer for FinShift
 
 Iterates through all existing WordPress posts and generates structured AI summaries
 if they are missing. Stores the result in the `_ai_structured_summary` custom field.

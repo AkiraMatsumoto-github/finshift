@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-SEO Optimizer for LogiShift Articles
+SEO Optimizer for FinShift Articles
 
 Generates SEO metadata including:
 - Meta descriptions (150-160 characters)
@@ -66,7 +66,7 @@ class SEOOptimizer:
     
     def _generate_fallback_description(self, title, keyword):
         """Generate a simple fallback meta description."""
-        return f"{keyword}について解説。{title}をわかりやすく説明します。物流DX・倉庫管理の最新情報をお届けします。"[:160]
+        return f"{keyword}について解説。{title}をわかりやすく説明します。金融市場・投資戦略の最新情報をお届けします。"[:160]
     
     def create_json_ld(self, article_data):
         """
@@ -90,14 +90,14 @@ class SEOOptimizer:
             "headline": article_data.get("title", ""),
             "author": {
                 "@type": "Organization",
-                "name": "LogiShift編集部"
+                "name": "FinShift編集部"
             },
             "publisher": {
                 "@type": "Organization",
-                "name": "LogiShift",
+                "name": "FinShift",
                 "logo": {
                     "@type": "ImageObject",
-                    "url": article_data.get("site_logo", "https://logishift.example.com/logo.png")
+                    "url": article_data.get("site_logo", "https://finshift.net/logo.png")
                 }
             },
             "datePublished": article_data.get("date_published", datetime.now().isoformat()),
@@ -139,7 +139,7 @@ class SEOOptimizer:
             "og:type": "article",
             "og:title": title,
             "og:description": description,
-            "og:site_name": "LogiShift",
+            "og:site_name": "FinShift",
             "og:locale": "ja_JP",
             
             # Twitter Card
@@ -190,9 +190,9 @@ if __name__ == "__main__":
     # Test
     optimizer = SEOOptimizer()
     
-    test_title = "物流DXを加速する自動倉庫とロボット：導入事例から学ぶ成功戦略"
-    test_keyword = "自動倉庫 ロボット"
-    test_content = "物流業界において、自動倉庫とロボットの導入は..."
+    test_title = "米為替市場の動向と今後：FRB金利政策から読むドル円戦略"
+    test_keyword = "ドル円 FRB"
+    test_content = "今週の為替市場において、ドル円はFRBの金利政策の影響を強く受け..."
     
     # Test meta description
     meta_desc = optimizer.generate_meta_description(test_title, test_content, test_keyword)
@@ -203,7 +203,7 @@ if __name__ == "__main__":
     # Test JSON-LD
     article_data = {
         "title": test_title,
-        "url": "https://logishift.example.com/article",
+        "url": "https://finshift.net/article",
         "date_published": "2025-11-27T10:00:00+09:00"
     }
     json_ld = optimizer.create_json_ld(article_data)

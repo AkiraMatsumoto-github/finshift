@@ -2,7 +2,7 @@
 /**
  * The template for displaying all pages
  *
- * @package LogiShift
+ * @package FinShift
  */
 
 get_header();
@@ -41,7 +41,7 @@ get_header();
 
 						wp_link_pages(
 							array(
-								'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'logishift' ),
+								'before' => '<div class="page-links">' . esc_html__( 'Pages:', 'finshift' ),
 								'after'  => '</div>',
 							)
 						);
