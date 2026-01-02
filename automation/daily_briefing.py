@@ -255,6 +255,27 @@ def phase_2_analysis(args):
         
         status = "draft" 
         
+        # Prepare Post Meta regardless of dry-run for verification
+        # Extract Scenarios
+        scenarios = analysis.get("scenarios", {})
+        bull_data = scenarios.get("bull", {})
+        bear_data = scenarios.get("bear", {})
+        
+        # Format Scenarios with Probability
+        bull_text = f"[{bull_data.get('probability', 'Unknown')}] {bull_data.get('condition', '')}"
+        bear_text = f"[{bear_data.get('probability', 'Unknown')}] {bear_data.get('condition', '')}"
+
+        # Extract AI Structured Summary
+        ai_structured_summary = analysis.get("ai_structured_summary", {})
+
+        post_meta = {
+            "_finshift_sentiment": analysis.get("sentiment_score"),
+            "_finshift_regime": analysis.get("market_regime"),
+            "_finshift_scenario_bull": bull_text,
+            "_finshift_scenario_bear": bear_text,
+            "_ai_structured_summary": json.dumps(ai_structured_summary, ensure_ascii=False)
+        }
+
         if not args.dry_run:
             res = wp.create_post(
                 title=title,
@@ -262,7 +283,8 @@ def phase_2_analysis(args):
                 status=status,
                 categories=[cat_id] if cat_id else [],
                 tags=tag_ids,
-                featured_media=featured_media_id
+                featured_media=featured_media_id,
+                meta=post_meta
             )
             
             if res:
@@ -270,7 +292,9 @@ def phase_2_analysis(args):
             else:
                 print("Failed to post to WordPress.")
         else:
-            print(f"[Dry-Run] Would post: {title} with Image ID: {featured_media_id}")
+            print(f"[Dry-Run] Would post: {title}")
+            print(f"[Dry-Run] With Meta: {json.dumps(post_meta, ensure_ascii=False)}")
+            print(f"[Dry-Run] Image ID: {featured_media_id}")
 
 
 def main():

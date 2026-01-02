@@ -43,6 +43,30 @@ get_header();
 								<?php endif; ?>
 								<span class="posted-on"><?php echo get_the_date(); ?></span>
 							</div>
+                            
+                            <?php
+                            // FinShift Custom Meta
+                            $sentiment = get_post_meta( get_the_ID(), '_finshift_sentiment', true );
+                            $regime = get_post_meta( get_the_ID(), '_finshift_regime', true );
+                            
+                            if ( $sentiment !== '' || $regime ) : ?>
+                                <div class="finshift-market-meta">
+                                    <?php if ( $regime ) : ?>
+                                        <span class="market-chip regime-label"><?php echo esc_html( $regime ); ?></span>
+                                    <?php endif; ?>
+                                    
+                                    <?php if ( $sentiment !== '' ) : 
+                                        $s_val = intval( $sentiment );
+                                        $s_class = ($s_val > 60) ? 'greed' : (($s_val < 40) ? 'fear' : 'neutral');
+                                        $s_text = ($s_val > 60) ? 'Greed' : (($s_val < 40) ? 'Fear' : 'Neutral');
+                                    ?>
+                                        <span class="market-chip sentiment-label <?php echo $s_class; ?>">
+                                            Sentiment: <?php echo $s_val; ?> (<?php echo $s_text; ?>)
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+
 							<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 						</header>
 

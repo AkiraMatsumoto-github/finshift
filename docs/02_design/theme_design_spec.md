@@ -1,90 +1,86 @@
-# LogiShift テーマ詳細設計書
+# FinShift テーマ実装仕様書 (Simplified)
 
-## 1. デザインコンセプト
-- **キーワード**: 信頼、先進性、ビジネス、物流、明快 (Clear)、直感 (Direct)
-- **デザイン方針**: Mobile-First, Flat Design, No Shadows/Gradients.
-- **カラーパレット**:
-    - メイン: ディープネイビー (`#0A192F`) - 信頼、堅実
-    - アクセント: テックブルー (`#00B4D8`) - 先進性、DX
-    - ベース: ホワイト/ライトグレー (`#F8F9FA`) - 清潔感
-    - テキスト: ダークグレー (`#333333`) - 可読性
-- **フォント**:
-    - 日本語: Noto Sans JP (Google Fonts)
-    - 英語: Inter (Google Fonts)
+メディアプランに基づき、"Financial Terminal" コンセプトを具体化するためのWordPressテーマ設計書です。
+**「過度なカスタマイズを避け、まずは自動化されたコンテンツを最大限魅力的に見せる」** ことを最優先とします。
 
-## 2. ページテンプレート構成 (Template Hierarchy)
+## 1. デザインコンセプト (Financial Terminal)
+- **キーワード**: High Density, Data-Driven, Professional.
+- **ビジュアル**: Bloomberg端末やTradingViewのような「黒基調」「数値重視」。
+- **配色**:
+    - **Background**: `#0F172A` (Slate 900) - Deep Navy.
+    - **Card Surface**: `#1E293B` (Slate 800) - With brighter borders.
+    - **Text Primary**: `#FFFFFF` (White) - Pure White for maximum contrast.
+    - **Text Secondary**: `#CBD5E1` (Slate 300) - High readability gray.
+    - **Border**: `#475569` (Slate 600) - Visible separation.
+    - **Accent**: `#38BDF8` (Sky 400) - Links, highlights.
+    - **Bull / Rise**: `#34D399` (Emerald 400).
+    - **Bear / Fall**: `#F87171` (Red 400).
+- **フォント**: `Inter` (英数字) + `Noto Sans JP` (日本語)。
 
-| テンプレートファイル | 用途 | 役割・機能 |
-| :--- | :--- | :--- |
-| `front-page.php` | トップページ | サイトの顔。新着記事、人気記事、カテゴリ別セクション、CTAを配置。 |
-| `home.php` | 記事一覧 | ブログロール（新着順の記事一覧）。 |
-| `single.php` | 記事詳細 | 個別の記事ページ。目次、本文、関連記事、シェアボタン、著者情報。 |
-| `page.php` | 固定ページ | 「運営者情報」「お問い合わせ」などの静的ページ。 |
-| `archive.php` | カテゴリ/タグ一覧 | 特定のカテゴリやタグに属する記事の一覧。 |
-| `search.php` | 検索結果 | サイト内検索の結果表示。 |
-| `404.php` | 404ページ | ページが見つからない場合の表示。サイトマップへの誘導。 |
+## 2. サイト構造 (Page Hierarchy)
 
-## 3. コンポーネント設計 (パーツ)
+### A. トップページ (`front-page.php`)
+サイトのダッシュボード。全ての重要情報が一目でわかる場所。
 
-### 共通パーツ
-- **ヘッダー (`header.php`)**:
-    - ロゴ (左)
-    - グローバルナビゲーション (右): 「物流コスト削減」「DX」「業界トレンド」「用語集」
-    - ハンバーガーメニュー (SP時)
-- **フッター (`footer.php`)**:
-    - サイトマップリンク
-    - 運営者情報リンク
-    - プライバシーポリシー
-    - Copyright
+1.  **Global Ticker Widget (Top Bar)**
+    - TradingView Ticker Tape Widgetを埋め込む。
+    - 表示: S&P500, Nasdaq, Nikkei225, Nifty50, USDJPY, Bitcoin.
+2.  **Market Pulse (Hero Section)**
+    - **Left**: **"Global Sentiment"** (Fear & Greed).
+        - データソース: Automationが `wp_options` に保存した最新スコアを表示。
+        - ビジュアル: メーターゲージ または 単純な数値 ("Extreme Greed: 85")。
+    - **Right**: **"Today's Scenarios"** (最新のDaily Briefingへのリンク).
+        - US, JP, Crypto の最新記事をカード表示。
+3.  **Latest News Stream**
+    - 全記事のタイムライン。タブ切り替え (All / Stocks / Crypto / FX)。
 
-### ページ固有パーツ
-- **ヒーローセクション (トップページ)**:
-    - キャッチコピー: 「物流でビジネスを良い方向へシフトさせる」
-    - 背景: 物流センターやネットワークをイメージした抽象的なグラフィック
-- **記事カード (一覧用)**:
-    - アイキャッチ画像
-    - カテゴリラベル
-    - タイトル
-    - 抜粋
-    - 公開日
-    - スタイル: フラットデザイン (Border only, No Shadow), モバイル時はStack Layout
-- **CTAボックス (記事下/サイドバー)**:
-    - メルマガ登録や資料請求への誘導バナー。
+### B. 記事詳細 (`single.php`)
+スイングトレーダーが分析を行うワークスペース。
 
-## 4. CMS設計 (WordPress設定)
+1.  **Header Area**
+    - タイトル (H1)
+    - **Meta Info**: 
+        - Region Tag (例: `US`, `India`)
+        - Market Regime (例: "Risk-Off") - カスタムフィールドから取得。
+2.  **Content Area**
+    - **Markdown Content**: Automationが生成したHTMLを表示。
+    - **Tables**: マークダウンテーブルをCSSで美しく整形 (Sticky Header, Stripe)。
+3.  **Sidebar (PC only)**
+    - **Mini Chart**: 記事のRegionに応じた代表指数チャート (TradingView Mini Chart)。
+    - **Related Scenarios**: 同一Regionの過去記事リンク。
 
-### 投稿タイプ (Post Types)
-今回は標準の「投稿 (Post)」と「固定ページ (Page)」を基本としますが、将来的な拡張性を考慮します。
+### C. リージョンアーカイブ (`archive.php`) / (`taxonomy-region.php`)
+特定の市場（例: インド株）だけを追いかけるためのページ。
 
-- **投稿 (post)**: 通常の記事コンテンツ（ニュース、ノウハウ、事例解説）。
-- **固定ページ (page)**: 会社概要、お問い合わせ、プライバシーポリシーなど。
+1.  **Region Header**
+    - リージョン名 (例: "India Market").
+    - **Key Chart**: その国の代表指数チャート (TradingView Symbol Info)。
+2.  **Article List**
+    - そのリージョンの記事一覧。
 
-### タクソノミー (Taxonomies)
-- **カテゴリー (category)**: 階層構造を持つ分類。
-    - `物流基礎` (slug: `basics`)
-    - `コスト削減` (slug: `cost-reduction`)
-    - `物流DX` (slug: `dx`)
-    - `業界トレンド` (slug: `trends`)
-- **タグ (post_tag)**: フラットなキーワード。
-    - `2024年問題`, `WMS`, `RFID`, `ラストワンマイル`, `トラックドライバー`
+## 3. データ連携仕様 (Data Binding)
 
-### カスタムフィールド (Custom Fields)
-プラグイン (Advanced Custom Fields 等) は初期段階では導入せず、必要に応じて検討します。
-まずは標準機能で対応します。
+Automation側からWordPressへ渡されるデータとその表示場所の定義です。
 
-- **SEO設定**: タイトルタグ、メタディスクリプションは、テーマ側で制御するか、将来的にSEOプラグイン (`The SEO Framework` 等) を導入する前提で設計します（今回はテーマの `functions.php` で最低限のメタタグを出力する機能を実装予定）。
+### 戦略的意義 (Strategic Value)
+これらのメタデータ連携は、単なる「飾り」ではなく、本サイトを「ブログ」ではなく「金融ツール」に昇華させるために必須です。
+1.  **Scan-ability (速報性)**: トレーダーはタイトルを読む前に「色（赤/緑）」と「数字（80）」で市場の温度感を0.5秒で判断できる。
+2.  **Data Asset (資産価値)**: 「過去にRisk-Offだった日の記事」のような検証的検索が可能になり、再来訪の理由を作る。
 
-### メニュー位置 (Menu Locations)
-- `primary`: ヘッダーメインナビゲーション
-- `footer`: フッターリンク
+| データ項目 | ソース (Python) | 保存先 (WordPress) | 表示場所 (Theme) | 実装ステータス |
+| :--- | :--- | :--- | :--- | :--- |
+| **記事本文** | `daily_briefing.py` | `post_content` | `single.php` | ✅ Implemented |
+| **アイキャッチ** | `gemini_client.py` | `_thumbnail_id` | `front-page`, `archive` | ✅ Implemented |
+| **Sentiment Score** | `daily_briefing.py` | **Post Meta**: `_finshift_sentiment` | `single.php` (Header) | ⚠️ **To Do** |
+| **Market Regime** | `daily_briefing.py` | **Post Meta**: `_finshift_regime` | `single.php` (Header) | ⚠️ **To Do** |
+| **Global Sentiment** | `daily_briefing.py` (US run) | **Option**: `finshift_global_sentiment` | `front-page.php` (Hero) | ⚠️ **To Do** |
+| **Region Tag** | `daily_briefing.py` | **Tag**: `US`, `JP`, etc. | `single.php`, `archive` | ✅ Implemented |
 
-### ウィジェットエリア (Widget Areas)
-- `sidebar-1`: 記事詳細ページのサイドバー（PC表示時のみ。モバイルでは非表示または下部へ移動）
+## 4. 推奨コンポーネント実装順序
 
-## 5. 開発ロードマップ (実装順序)
+1.  **Data Binding補完**: Automation側で `To Do` のメタデータ送信を実装する (これが無いとFrontendで表示できない)。
+2.  **Base Setup**: `functions.php` でCSS/JS読み込み、フォント設定。
+3.  **Single Page**: 記事が正しく読める状態にする (Markdown Styleの整備)。
+4.  **Front Page**: ダッシュボード化 (TradingView Widget埋め込み)。
 
-1.  **ベース構築**: `functions.php` (セットアップ), `style.css` (変数定義), `header.php`, `footer.php`
-2.  **トップページ**: `front-page.php` (ヒーローセクション, 新着一覧)
-3.  **記事詳細**: `single.php` (本文スタイル, 目次, 関連記事)
-4.  **アーカイブ**: `archive.php` (カテゴリ一覧表示)
-5.  **固定ページ**: `page.php` (シンプルなお知らせ等)
+この構成により、ミニマムで「使える」金融ターミナル用メディアを立ち上げます。

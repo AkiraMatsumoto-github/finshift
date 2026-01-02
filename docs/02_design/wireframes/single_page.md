@@ -1,9 +1,9 @@
-# Wireframe: Single Post Page
+# Wireframe: Single Post Page - Phase 1
 
 ## 概要
 - **ファイル名**: `single.php`
-- **役割**: 記事を読ませるだけでなく、具体的なアクション（口座開設・ツール導入）へ誘導する。
-- **重要要素**: Disclaimer (免責), Cross-Asset Impact (相関分析), Affiliate CTA.
+- **役割**: 記事を読ませ、具体的な市場認識を提供する。
+- **重要要素**: Disclaimer (免責), Readable Markdown Content, Region Context.
 
 ## Layout (Mobile First)
 
@@ -11,63 +11,40 @@
 +--------------------------------------------------+
 | [Header (Sticky)]                                |
 | [ < ]  Category / Title ...                      |
-| ------------------------------------------------ |
-| [Risk Monitor Bar (Sticky)]                      |
-| BTC: +2.1% ▲ | Gold: -0.5% ▼ | Oil: +1.2% ▲      |
 +--------------------------------------------------+
 | [Hero Image (Vertex AI Gen)]                     |
 | Text overlay: 記事タイトル                       |
 +--------------------------------------------------+
 | [Title Section]                                  |
-| [Category: India] [Dec 29, 2025]                 |
-| TATA Motors Q3 Earnings:                         |
-| EV Sales Surge 40% YoY                           |
+| [Region: India] [Jan 01, 2026]                   |
+| [Sentiment: Greed 80] [Regime: Risk-On]          |
+| TATA Motors Q3 Earnings Surge                    |
 +--------------------------------------------------+
 | [ ! Disclaimer Box (Warning Color) ]             |
 | "本記事は投資助言ではありません..."              |
 +--------------------------------------------------+
-| [Cross-Asset Impact (AI Generated)]              |
-| 🛢 Crude Oil: $69.50 (-2.1%)                     |
-| "原油安によるコスト減が利益率改善に寄与..."      |
+| [Article Content (Markdown rendered)]            |
 |                                                  |
-| 🇺🇸 US 10Y Yield: 3.8% (-0.05%)                   |
-| "金利低下もグロース株に追い風..."                |
-+--------------------------------------------------+
-| [Lead Text]                                      |
-| タタ自動車の第3四半期決算は、市場予想を大きく... |
-+--------------------------------------------------+
-| [Table of Contents] (Accordion - Closed by def)  |
-| [Show Index +]                                   |
-+--------------------------------------------------+
-| [Main Content]                                   |
+| <h2>1. Market Pulse</h2>                         |
+| 今日の市場は...                                  |
 |                                                  |
-| <h2>1. Record Revenue</h2>                       |
+| <h2>2. Analysis</h2>                             |
 | テキスト...                                      |
+| > **Important**: 引用や強調表示                   |
 |                                                  |
-| [Mini Chart Widget: TATA.NS]                     |
-| (Interactive TradingView Chart 1D)               |
-|                                                  |
-| <h2>2. JLR Division Performance</h2>             |
-| テキスト...                                      |
-|                                                  |
-| <h2>3. AI Scenario</h2>                          |
-| [ Bullish Case ] [ Bearish Case ] (Tabs)         |
-| "若年層のEV購入意欲が高く、都市部での..."        |
+| (Cross-Asset Impactなども本文内に記述)           |
 +--------------------------------------------------+
-| [Actionable Insight (Affiliate CTA)]             |
-| +----------------------------------------------+ |
-| | 📈 この銘柄を取引するなら                    | |
-| | [Button: Open Account at Saxo Bank]          | |
-| | "インド株の取扱銘柄数No.1"                   | |
-| +----------------------------------------------+ |
-| +----------------------------------------------+ |
-| | 📊 高度なチャート分析をするなら              | |
-| | [Button: Try TradingView Premium]            | |
-| +----------------------------------------------+ |
+| [Regional Chart Widget]                          |
+| (TradingView Widget for Region e.g., NIFTY50)    |
+| *記事ごとの個別銘柄ではなく地域代表指数を表示*   |
 +--------------------------------------------------+
-| [Related Articles]                               |
-| - Relevant News 1                                |
-| - Relevant News 2                                |
+| [Actionable Insight (Text/Link)]                 |
+| "インド市場を取引するなら..."                    |
+| [Affiliate Link / Button]                        |
++--------------------------------------------------+
+| [Related Scenarios]                              |
+| - 同地域の過去記事リンク 1                       |
+| - 同地域の過去記事リンク 2                       |
 +--------------------------------------------------+
 | [Footer]                                         |
 +--------------------------------------------------+
@@ -76,7 +53,6 @@
 ## Desktop Layout
 - **2 Column**:
     - **Main**: Article Content.
-    - **Sidebar**:
-        - **Mini Chart** of the related ticker (Sticky).
-        - **Related News** (Same region).
-        - **AdSense / Affiliate Banners**.
+    - **Sidebar (Sticky)**:
+        - **Regional Chart** (Nifty 50, S&P 500 etc).
+        - **Related News**.

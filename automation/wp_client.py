@@ -66,6 +66,61 @@ class WordPressClient:
             return None
             return None
 
+
+    def update_resource(self, endpoint, resource_id, data):
+        """
+        Update a resource (post, page, etc) by ID.
+        """
+        url = f"{self.api_url}/{endpoint}/{resource_id}"
+        try:
+            response = requests.post(url, json=data, auth=self.auth)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.RequestException as e:
+            print(f"Error updating resource {resource_id}: {e}")
+            if hasattr(e, 'response') and e.response is not None:
+                print(f"Response content: {e.response.text}")
+            return None
+
+    def get_pages_by_meta(self, meta_key, meta_value):
+        """
+        Find pages that have a specific meta key/value.
+        Note: This is inefficient in default WP API unless keys are registered as query vars.
+        Alternative: Get all pages and filter (okay for small site like this).
+        """
+        try:
+            # Fetch all pages (limit 100)
+            url = f"{self.api_url}/pages"
+            params = {"per_page": 100, "status": "publish"}
+            response = requests.get(url, params=params, auth=self.auth)
+            response.raise_for_status()
+            
+            pages = response.json()
+            matched = []
+            
+            for page in pages:
+                # Meta is often not fully exposed unless authenticated context="edit" which we have.
+                # But standard schema might put it in 'meta' dict.
+                # Sometimes retrieving by context=edit is needed.
+                # Let's retry with context=edit
+                pass 
+            
+            # Re-fetch with context=edit to ensure meta is present
+            params['context'] = 'edit'
+            response = requests.get(url, params=params, auth=self.auth)
+            pages = response.json()
+            
+            for page in pages:
+                meta = page.get('meta', {})
+                if meta.get(meta_key) == meta_value:
+                    matched.append(page)
+                    
+            return matched
+            
+        except Exception as e:
+            print(f"Error searching pages: {e}")
+            return []
+
     def create_page(self, title, content, status="publish", slug=None, parent=None):
         """
         Create a new page in WordPress.
@@ -186,7 +241,7 @@ class WordPressClient:
         Retrieve popular posts from custom endpoint.
         """
         try:
-            url = f"{self.wp_url}/?rest_route=/logishift/v1/popular-posts"
+            url = f"{self.wp_url}/?rest_route=/finshift/v1/popular-posts"
             params = {
                 "days": days,
                 "limit": limit

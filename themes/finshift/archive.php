@@ -12,15 +12,65 @@ get_header();
 <main id="primary" class="site-main">
 	
 	<!-- Archive Header -->
-	<section class="archive-hero">
+	<section class="archive-hero" style="background-color: var(--color-bg-primary); padding-bottom: 0;">
 		<div class="container">
 			<?php
 			$object = get_queried_object();
+            $slug = isset($object->slug) ? $object->slug : '';
+            
+            // Symbol Mapping
+            $symbols = [
+                'us' => 'FOREXCOM:SPXUSD', 'usa' => 'FOREXCOM:SPXUSD',
+                'jp' => 'TVC:NI225', 'japan' => 'TVC:NI225',
+                'china' => 'TVC:SHCOMP',
+                'europe' => 'TVC:DEU40',
+                'india' => 'NSE:NIFTY',
+                'crypto' => 'BINANCE:BTCUSDT',
+                'fx' => 'FX:USDJPY',
+                'stocks' => 'FOREXCOM:SPXUSD', // Default for stocks
+                'commodities' => 'TVC:GOLD',
+                'tech' => 'NASDAQ:NDX',
+                'semiconductor' => 'NASDAQ:SOX',
+            ];
+            
+            $chart_symbol = isset($symbols[$slug]) ? $symbols[$slug] : null;
 			?>
-			<h1 class="archive-title"><?php the_archive_title(); ?></h1>
-			<?php if ( get_the_archive_description() ) : ?>
-				<div class="archive-description"><?php the_archive_description(); ?></div>
-			<?php endif; ?>
+            
+            <div class="archive-header-content" style="margin-bottom: var(--spacing-lg);">
+			    <h1 class="archive-title"><?php the_archive_title(); ?></h1>
+			    <?php if ( get_the_archive_description() ) : ?>
+				    <div class="archive-description"><?php the_archive_description(); ?></div>
+			    <?php endif; ?>
+            </div>
+            
+            <?php if ($chart_symbol) : ?>
+                <!-- Regional/Topic Chart -->
+                <div class="regional-chart-widget" style="height: 400px; margin-bottom: -40px; border: 1px solid var(--color-bg-tertiary); border-radius: var(--radius-lg); overflow: hidden;">
+                    <!-- TradingView Widget BEGIN -->
+                    <div class="tradingview-widget-container" style="height:100%;width:100%">
+                        <div class="tradingview-widget-container__widget" style="height:100%;width:100%"></div>
+                        <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js" async>
+                        {
+                        "autosize": true,
+                        "symbol": "<?php echo $chart_symbol; ?>",
+                        "interval": "D",
+                        "timezone": "Asia/Tokyo",
+                        "theme": "dark",
+                        "style": "1",
+                        "locale": "ja",
+                        "enable_publishing": false,
+                        "hide_top_toolbar": true,
+                        "hide_legend": false,
+                        "save_image": false,
+                        "calendar": false,
+                        "hide_volume": true,
+                        "support_host": "https://www.tradingview.com"
+                        }
+                        </script>
+                    </div>
+                    <!-- TradingView Widget END -->
+                </div>
+            <?php endif; ?>
 		</div>
 	</section>
 

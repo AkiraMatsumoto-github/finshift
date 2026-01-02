@@ -1,27 +1,27 @@
 <?php
 /**
- * LogiShift functions and definitions
+ * FinShift functions and definitions
  *
- * @package LogiShift
+ * @package FinShift
  */
 
 // Enqueue styles
-function logishift_scripts() {
-    wp_enqueue_style( 'logishift-style', get_stylesheet_uri(), array(), '1.0.15' );
+function finshift_scripts() {
+    wp_enqueue_style( 'finshift-style', get_stylesheet_uri(), array(), '1.0.15' );
 
     // Swiper
     if ( is_front_page() ) {
         wp_enqueue_style( 'swiper-css', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css', array(), '11.0.0' );
         wp_enqueue_script( 'swiper-js', 'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js', array(), '11.0.0', true );
-        wp_enqueue_script( 'logishift-front-page', get_template_directory_uri() . '/assets/js/front-page.js', array( 'swiper-js', 'jquery' ), '1.0.0', true );
+        wp_enqueue_script( 'finshift-front-page', get_template_directory_uri() . '/assets/js/front-page.js', array( 'swiper-js', 'jquery' ), '1.0.0', true );
     }
 
-    wp_enqueue_script( 'logishift-navigation', get_template_directory_uri() . '/assets/js/navigation.js', array(), '1.0.7', true );
+    wp_enqueue_script( 'finshift-navigation', get_template_directory_uri() . '/assets/js/navigation.js', array(), '1.0.7', true );
 }
-add_action( 'wp_enqueue_scripts', 'logishift_scripts' );
+add_action( 'wp_enqueue_scripts', 'finshift_scripts' );
 
-if ( ! function_exists( 'logishift_setup' ) ) :
-	function logishift_setup() {
+if ( ! function_exists( 'finshift_setup' ) ) :
+	function finshift_setup() {
 		// Add default posts and comments RSS feed links to head.
 		add_theme_support( 'automatic-feed-links' );
 
@@ -40,8 +40,8 @@ if ( ! function_exists( 'logishift_setup' ) ) :
 		// Register navigation menus.
 		register_nav_menus(
 			array(
-				'menu-1' => esc_html__( 'Primary', 'logishift' ),
-				'footer' => esc_html__( 'Footer', 'logishift' ),
+				'menu-1' => esc_html__( 'Primary', 'finshift' ),
+				'footer' => esc_html__( 'Footer', 'finshift' ),
 			)
 		);
 
@@ -57,19 +57,19 @@ if ( ! function_exists( 'logishift_setup' ) ) :
 		);
 	}
 endif;
-add_action( 'after_setup_theme', 'logishift_setup' );
+add_action( 'after_setup_theme', 'finshift_setup' );
 
 /**
  * Register widget area.
  *
  * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
  */
-function logishift_widgets_init() {
+function finshift_widgets_init() {
 	register_sidebar(
 		array(
-			'name'          => esc_html__( 'Sidebar', 'logishift' ),
+			'name'          => esc_html__( 'Sidebar', 'finshift' ),
 			'id'            => 'sidebar-1',
-			'description'   => esc_html__( 'Add widgets here.', 'logishift' ),
+			'description'   => esc_html__( 'Add widgets here.', 'finshift' ),
 			'before_widget' => '<section id="%1$s" class="widget %2$s">',
 			'after_widget'  => '</section>',
 			'before_title'  => '<h2 class="widget-title">',
@@ -77,12 +77,12 @@ function logishift_widgets_init() {
 		)
 	);
 }
-add_action( 'widgets_init', 'logishift_widgets_init' );
+add_action( 'widgets_init', 'finshift_widgets_init' );
 
 /**
  * Create dummy menu for demonstration.
  */
-function logishift_create_dummy_menu() {
+function finshift_create_dummy_menu() {
     $menu_name = 'Primary Menu';
     $menu_exists = wp_get_nav_menu_object( $menu_name );
 
@@ -90,37 +90,37 @@ function logishift_create_dummy_menu() {
         $menu_id = wp_create_nav_menu( $menu_name );
 
         wp_update_nav_menu_item( $menu_id, 0, array(
-            'menu-item-title' =>  __( 'Home', 'logishift' ),
+            'menu-item-title' =>  __( 'Home', 'finshift' ),
             'menu-item-url' => home_url( '/' ),
             'menu-item-status' => 'publish'
         ) );
 
         wp_update_nav_menu_item( $menu_id, 0, array(
-            'menu-item-title' =>  __( 'About', 'logishift' ),
+            'menu-item-title' =>  __( 'About', 'finshift' ),
             'menu-item-url' => home_url( '/about/' ),
             'menu-item-status' => 'publish'
         ) );
 
         wp_update_nav_menu_item( $menu_id, 0, array(
-            'menu-item-title' =>  __( 'Logistics Strategy', 'logishift' ),
+            'menu-item-title' =>  __( 'Logistics Strategy', 'finshift' ),
             'menu-item-url' => home_url( '/category/strategy/' ),
             'menu-item-status' => 'publish'
         ) );
 
         wp_update_nav_menu_item( $menu_id, 0, array(
-            'menu-item-title' =>  __( 'DX Solutions', 'logishift' ),
+            'menu-item-title' =>  __( 'DX Solutions', 'finshift' ),
             'menu-item-url' => home_url( '/category/dx/' ),
             'menu-item-status' => 'publish'
         ) );
 
         wp_update_nav_menu_item( $menu_id, 0, array(
-            'menu-item-title' =>  __( 'Cost Reduction', 'logishift' ),
+            'menu-item-title' =>  __( 'Cost Reduction', 'finshift' ),
             'menu-item-url' => home_url( '/category/cost/' ),
             'menu-item-status' => 'publish'
         ) );
 
         wp_update_nav_menu_item( $menu_id, 0, array(
-            'menu-item-title' =>  __( 'Contact', 'logishift' ),
+            'menu-item-title' =>  __( 'Contact', 'finshift' ),
             'menu-item-url' => home_url( '/contact/' ),
             'menu-item-status' => 'publish'
         ) );
@@ -130,12 +130,12 @@ function logishift_create_dummy_menu() {
         set_theme_mod( 'nav_menu_locations', $locations );
     }
 }
-add_action( 'init', 'logishift_create_dummy_menu' );
+add_action( 'init', 'finshift_create_dummy_menu' );
 
 /**
  * Add search form to navigation menu.
  */
-function logishift_add_search_to_menu( $items, $args ) {
+function finshift_add_search_to_menu( $items, $args ) {
     if ( $args->theme_location == 'menu-1' ) {
         $items .= '<li class="menu-item menu-item-search">';
         $items .= get_search_form( false );
@@ -144,12 +144,12 @@ function logishift_add_search_to_menu( $items, $args ) {
     return $items;
 }
 
-add_filter( 'wp_nav_menu_items', 'logishift_add_search_to_menu', 10, 2 );
+add_filter( 'wp_nav_menu_items', 'finshift_add_search_to_menu', 10, 2 );
 
 /**
  * Output SEO Meta Tags.
  */
-function logishift_seo_meta() {
+function finshift_seo_meta() {
     global $post;
 
     // Default values
@@ -207,26 +207,26 @@ function logishift_seo_meta() {
     <meta name="twitter:image" content="<?php echo esc_url( $image ); ?>">
     <?php
 }
-add_action( 'wp_head', 'logishift_seo_meta', 1 );
+add_action( 'wp_head', 'finshift_seo_meta', 1 );
 
 /**
  * Disable canonical redirects only for category URLs.
  * This prevents ?cat=ID from being redirected to /category/slug/
  * while keeping redirects working for other pages.
  */
-function logishift_disable_category_redirect( $redirect_url ) {
+function finshift_disable_category_redirect( $redirect_url ) {
     if ( is_category() && strpos( $_SERVER['REQUEST_URI'], '?cat=' ) !== false ) {
         return false;
     }
     return $redirect_url;
 }
-add_filter( 'redirect_canonical', 'logishift_disable_category_redirect' );
+add_filter( 'redirect_canonical', 'finshift_disable_category_redirect' );
 
 /**
  * Force enable pretty permalinks.
  * This ensures post URLs work correctly.
  */
-function logishift_enable_permalinks() {
+function finshift_enable_permalinks() {
     $current_structure = get_option( 'permalink_structure' );
     if ( empty( $current_structure ) ) {
         global $wp_rewrite;
@@ -235,14 +235,14 @@ function logishift_enable_permalinks() {
         $wp_rewrite->flush_rules( true );
     }
 }
-add_action( 'init', 'logishift_enable_permalinks' );
+add_action( 'init', 'finshift_enable_permalinks' );
 
 /**
  * Automatically generate SEO-friendly English slugs from Japanese titles.
  * Uses post ID (e.g., post-123) to ensure clean URLs.
  * Hooked to save_post to ensure ID is available.
  */
-function logishift_auto_generate_slug_on_save( $post_id, $post, $update ) {
+function finshift_auto_generate_slug_on_save( $post_id, $post, $update ) {
     // Only process posts
     if ( $post->post_type !== 'post' ) {
         return;
@@ -258,7 +258,7 @@ function logishift_auto_generate_slug_on_save( $post_id, $post, $update ) {
     if ( empty( $slug ) || preg_match( '/[ぁ-んァ-ヶー一-龠％]/u', $slug ) || strpos( $slug, '%' ) !== false ) {
         
         // Unhook to prevent infinite loop
-        remove_action( 'save_post', 'logishift_auto_generate_slug_on_save', 10, 3 );
+        remove_action( 'save_post', 'finshift_auto_generate_slug_on_save', 10, 3 );
 
         // Update the post slug
         wp_update_post( array(
@@ -267,16 +267,16 @@ function logishift_auto_generate_slug_on_save( $post_id, $post, $update ) {
         ) );
 
         // Re-hook
-        add_action( 'save_post', 'logishift_auto_generate_slug_on_save', 10, 3 );
+        add_action( 'save_post', 'finshift_auto_generate_slug_on_save', 10, 3 );
     }
 }
-add_action( 'save_post', 'logishift_auto_generate_slug_on_save', 10, 3 );
+add_action( 'save_post', 'finshift_auto_generate_slug_on_save', 10, 3 );
 
 /**
  * Sanitize post slugs to prevent Japanese characters in URLs.
  * Generates clean English slugs from Japanese titles.
  */
-function logishift_sanitize_post_slug( $slug, $post_ID, $post_status, $post_type ) {
+function finshift_sanitize_post_slug( $slug, $post_ID, $post_status, $post_type ) {
     // Only process posts, not pages or other post types
     if ( $post_type !== 'post' ) {
         return $slug;
@@ -295,26 +295,14 @@ function logishift_sanitize_post_slug( $slug, $post_ID, $post_status, $post_type
 
     return $slug;
 }
-add_filter( 'wp_unique_post_slug', 'logishift_sanitize_post_slug', 10, 4 );
+add_filter( 'wp_unique_post_slug', 'finshift_sanitize_post_slug', 10, 4 );
 
-/**
- * Register custom meta fields for REST API.
- * This exposes the AI structured summary to the API.
- */
-function logishift_register_meta() {
-    register_post_meta( 'post', 'ai_structured_summary', array(
-        'show_in_rest' => true,
-        'single'       => true,
-        'type'         => 'string',
-        'auth_callback' => '__return_true'
-    ) );
-}
-add_action( 'init', 'logishift_register_meta' );
+
 
 /**
  * Remove prefixes from archive titles.
  */
-function logishift_archive_title( $title ) {
+function finshift_archive_title( $title ) {
     if ( is_category() ) {
         $title = single_cat_title( '', false );
     } elseif ( is_tag() ) {
@@ -328,7 +316,7 @@ function logishift_archive_title( $title ) {
     }
     return $title;
 }
-add_filter( 'get_the_archive_title', 'logishift_archive_title' );
+add_filter( 'get_the_archive_title', 'finshift_archive_title' );
 
 /**
  * View Controller for Popular Articles.
@@ -336,40 +324,51 @@ add_filter( 'get_the_archive_title', 'logishift_archive_title' );
 require get_template_directory() . '/inc/view-controller.php';
 
 /**
+ * Market Dashboard Metaboxes.
+ */
+require get_template_directory() . '/inc/market-metaboxes.php';
+
+/**
+ * Post Meta Registration for REST API.
+ */
+require get_template_directory() . '/inc/post-meta.php';
+
+/**
  * Initialize Popular Articles DB Table.
  * Runs on init to check if table needs creation/update.
  */
-function logishift_initialize_popular_articles() {
-    $current_version = get_option( 'logishift_view_table_version' );
+function finshift_initialize_popular_articles() {
+    $current_version = get_option( 'finshift_view_table_version' );
     if ( version_compare( $current_version, '1.0.0', '<' ) ) {
-        logishift_create_view_table();
+        finshift_create_view_table();
     }
 }
+add_action( 'init', 'finshift_initialize_popular_articles' );
 /**
  * Register REST API endpoint for Popular Posts.
- * Endpoint: /wp-json/logishift/v1/popular-posts
+ * Endpoint: /wp-json/finshift/v1/popular-posts
  */
-function logishift_register_popular_posts_route() {
-    register_rest_route( 'logishift/v1', '/popular-posts', array(
+function finshift_register_popular_posts_route() {
+    register_rest_route( 'finshift/v1', '/popular-posts', array(
         'methods'  => 'GET',
-        'callback' => 'logishift_get_popular_posts_api',
+        'callback' => 'finshift_get_popular_posts_api',
         'permission_callback' => '__return_true', // Public endpoint
     ) );
 }
-add_action( 'rest_api_init', 'logishift_register_popular_posts_route' );
+add_action( 'rest_api_init', 'finshift_register_popular_posts_route' );
 
 /**
  * Callback for Popular Posts API.
  */
-function logishift_get_popular_posts_api( $request ) {
+function finshift_get_popular_posts_api( $request ) {
     $days = $request->get_param( 'days' ) ? intval( $request->get_param( 'days' ) ) : 30; // Default to 30 days for broader range
     $limit = $request->get_param( 'limit' ) ? intval( $request->get_param( 'limit' ) ) : 20;
 
-    if ( ! function_exists( 'logishift_get_popular_posts' ) ) {
+    if ( ! function_exists( 'finshift_get_popular_posts' ) ) {
         return new WP_Error( 'no_function', 'Popular posts function not found', array( 'status' => 500 ) );
     }
 
-    $posts = logishift_get_popular_posts( $days, $limit );
+    $posts = finshift_get_popular_posts( $days, $limit );
     
     $data = array();
     foreach ( $posts as $post ) {

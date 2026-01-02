@@ -13,46 +13,47 @@
 				<div class="footer-columns">
 					<!-- About Column -->
 					<div class="footer-column">
-						<h3 class="footer-title">LogiShift</h3>
-						<p class="footer-description">物流担当者と経営層のための課題解決メディア。現場のノウハウから最新のDX事例まで、ビジネスを加速させる情報をお届けします。</p>
+						<h3 class="footer-title">FinShift</h3>
+						<p class="footer-description">世界主要市場（US, JP, India, China）と重要資産（Crypto, Commodity）の「今」を読み解くマーケット・インテリジェンス・メディア。データとAIシナリオで、スイングトレーダーの意思決定を支援します。</p>
 					</div>
 
-					<!-- Categories Column -->
+					<!-- Markets Column -->
 					<div class="footer-column">
-						<h3 class="footer-title">カテゴリー</h3>
+						<h3 class="footer-title">Markets</h3>
 						<ul class="footer-links">
-							<li><a href="<?php echo esc_url( home_url( '/?cat=11' ) ); ?>">物流DX・トレンド</a></li>
-							<li><a href="<?php echo esc_url( home_url( '/?cat=12' ) ); ?>">倉庫管理・WMS</a></li>
-							<li><a href="<?php echo esc_url( home_url( '/?cat=13' ) ); ?>">輸配送・TMS</a></li>
-							<li><a href="<?php echo esc_url( home_url( '/?cat=14' ) ); ?>">マテハン・ロボット</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/category/market-analysis/' ) ); ?>">Market Analysis</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/category/featured-news/' ) ); ?>">Featured News</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/us/' ) ); ?>">US Market</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/japan/' ) ); ?>">Japan Market</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/india/' ) ); ?>">India Market</a></li>
 						</ul>
 					</div>
 
-					<!-- More Categories Column -->
+					<!-- Assets Column -->
 					<div class="footer-column">
-						<h3 class="footer-title">もっと探す</h3>
+						<h3 class="footer-title">Assets & Guide</h3>
 						<ul class="footer-links">
-							<li><a href="<?php echo esc_url( home_url( '/?cat=15' ) ); ?>">サプライチェーン</a></li>
-							<li><a href="<?php echo esc_url( home_url( '/?cat=17' ) ); ?>">海外トレンド</a></li>
-							<li><a href="<?php echo esc_url( home_url( '/?cat=16' ) ); ?>">事例</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/crypto/' ) ); ?>">Crypto</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/forex/' ) ); ?>">Forex</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/tag/commodity/' ) ); ?>">Commodities</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/category/investment-guide/' ) ); ?>">Investment Guide</a></li>
 						</ul>
 					</div>
 
 					<!-- Info Column -->
 					<div class="footer-column">
-						<h3 class="footer-title">サイト情報</h3>
+						<h3 class="footer-title">Information</h3>
 						<ul class="footer-links">
-							<li><a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">運営者情報</a></li>
-							<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">お問い合わせ</a></li>
-							<li><a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>">プライバシーポリシー</a></li>
-							<li><a href="https://en.logishift.net/">LogiShift Global</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About Us</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Contact</a></li>
+							<li><a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>">Privacy Policy</a></li>
 						</ul>
 					</div>
 				</div>
 
 				<!-- Footer Bottom -->
 				<div class="footer-bottom">
-					<p class="copyright">&copy; <?php echo date( 'Y' ); ?> LogiShift. All rights reserved.</p>
+					<p class="copyright">&copy; <?php echo date( 'Y' ); ?> FinShift. All rights reserved.</p>
 				</div>
 			</div>
 		</div>

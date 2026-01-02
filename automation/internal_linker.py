@@ -56,10 +56,10 @@ class InternalLinkSuggester:
         # get_posts returns dict directly. get_popular_posts returns similar struct.
         
         meta = post.get('meta', {})
-        if 'ai_structured_summary' in meta:
+        if '_ai_structured_summary' in meta:
              try:
                  # Check if it's already a dict (API sometimes expands) or string
-                 summary_val = meta['ai_structured_summary']
+                 summary_val = meta['_ai_structured_summary']
                  if isinstance(summary_val, str):
                     ai_summary_json = json.loads(summary_val)
                  elif isinstance(summary_val, dict):

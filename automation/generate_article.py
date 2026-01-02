@@ -312,6 +312,8 @@ Select the most relevant ones (if any) and include them in the article using sta
         if args.dry_run:
             print(f"  [Dry Run Preview] Summary: {structured_summary.get('summary')}")
             print(f"  [Dry Run Preview] Topics: {structured_summary.get('key_topics')}")
+            print(f"  [Dry Run Preview] Sentiment: {structured_summary.get('sentiment_score')}")
+            print(f"  [Dry Run Preview] Regime: {structured_summary.get('market_regime')}")
     else:
         print("  - Warning: Failed to generate structured summary.")
         structured_summary = None
@@ -414,6 +416,20 @@ Select the most relevant ones (if any) and include them in the article using sta
 
         if 'structured_summary' in locals() and structured_summary:
             meta_fields["ai_structured_summary"] = json.dumps(structured_summary, ensure_ascii=False)
+            
+            # Extract Sentiment & Regime
+            if "sentiment_score" in structured_summary:
+                meta_fields["_finshift_sentiment"] = structured_summary["sentiment_score"]
+                print(f"  - Sentiment Score: {structured_summary['sentiment_score']}")
+            if "market_regime" in structured_summary:
+                meta_fields["_finshift_regime"] = structured_summary["market_regime"]
+                print(f"  - Market Regime: {structured_summary['market_regime']}")
+            
+            # Extract Scenarios
+            if "bull_scenario" in structured_summary:
+                meta_fields["_finshift_scenario_bull"] = structured_summary["bull_scenario"]
+            if "bear_scenario" in structured_summary:
+                meta_fields["_finshift_scenario_bear"] = structured_summary["bear_scenario"]
 
         result = wp.create_post(
             title=optimized_title, 

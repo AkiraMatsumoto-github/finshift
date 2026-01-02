@@ -650,7 +650,11 @@ class GeminiClient:
         {{
             "summary": "Detailed summary of the article content (300-500 chars) in Japanese. Mention specific methods, technologies, or case studies discussed.",
             "key_topics": ["list", "of", "specific", "sub-topics", "covered", "(in Japanese)"],
-            "entities": ["list", "of", "companies", "products", "or", "tools", "mentioned", "(preserve original names)"]
+            "entities": ["list", "of", "companies", "products", "or", "tools", "mentioned", "(preserve original names)"],
+            "sentiment_score": 50, // Integer 0-100 (0=Extreme Bearish, 50=Neutral, 100=Extreme Bullish) based on the article's tone match to market sentiment.
+            "market_regime": "Risk-On", // String Enum: "Risk-On", "Risk-Off", "Neutral", "Volatile", "Correction"
+            "bull_scenario": "Brief description of the bullish scenario (if applicable) in Japanese.",
+            "bear_scenario": "Brief description of the bearish scenario (if applicable) in Japanese."
         }}
         """)
         
@@ -870,22 +874,30 @@ class GeminiClient:
         {news_text}
         
         ## Analysis Tasks
-        1. **Market Regime**: Define the current mood (e.g., "Risk-On", "Risk-Off", "Goldilocks", "Stagflation Fear").
+        1. **Market Regime**: Define the current mood in **Japanese** (e.g., "リスクオン", "リスクオフ", "適温相場", "スタグフレーション懸念", "様子見", "調整局面").
         2. **Sentiment Score**: 0 (Extreme Fear) to 100 (Extreme Greed). Estimate based on news tone and VIX/Market moves.
         3. **Primary Driver**: What single factor is driving prices today? (e.g. "Fed Pivot Hope", "China Slowdown").
         4. **Scenarios**:
-           - **Bull Case**: What needs to happen for prices to rise?
-           - **Bear Case**: What are the downside risks?
+           - **Bull Case**: Specific condition for upside. Write in **Japanese** (detail Condition -> detail Result & specific value format), around 100 chars.
+           - **Bear Case**: Specific condition for downside. Write in **Japanese** (detail Condition -> detail Result & specific value format), around 100 chars.
         
+        5. **AI Structured Summary**:
+           - **summary**: A concise summary of the market driver and impact (max 200 chars). Used for dashboard cards. e.g. "米雇用統計が予想を上回り、FRBの利下げ観測が後退。これを受け米金利は急騰し..."
+           - **key_topics**: List of 3-5 key entities or topics (e.g. ["NVIDIA", "CPI", "USD/JPY"]). Used for internal linking.
+
         ## Output JSON
         {{
-            "market_regime": "Risk-On",
+            "market_regime": "リスクオン",
             "sentiment_score": 75,
             "sentiment_label": "Greed",
             "primary_driver": "...",
             "scenarios": {{
                 "bull": {{ "condition": "...", "probability": "Low/Medium/High" }},
                 "bear": {{ "condition": "...", "probability": "Low/Medium/High" }}
+            }},
+            "ai_structured_summary": {{
+                "summary": "...",
+                "key_topics": ["...", "..."]
             }},
             "reasoning": "Brief reasoning for the score"
         }}

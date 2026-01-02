@@ -122,59 +122,77 @@ finshift/ (Current Dir)
 Automation側で生成したデータを、WordPressテーマ側でどう表示するか（連携部分）。
 - [ ] **Sentiment Widget**: `sentiment_analyzer.py` の結果を WP Options API に POST する機能の実装。
 - [ ] **Scenario Summary**: 記事生成時に「3行まとめ」を作成し、カスタムフィールドに保存する処理の確認。
-- [ ] **Market Ticker Workflow**: `market_data.py` を20分おきに回すワークフローの設定。
 
 
 ### 3.4. Workflow Setup (GitHub Actions)
-- [ ] **Daily Workflows**: 国ごとのデイリー・ブリーフィングの定期実行設定。
 - [ ] **Weekly Summary**: `workflows/weekly_summary.yml` (毎週日曜夜) の設定。
-- [ ] **Market Ticker**: `workflows/market_ticker.yml` (Risk Monitor更新用, 20分毎) の設定。
 
 
 ### 3.7. Market Analysis Enhancements (Precision & Depth)
-- [] **Technical Indicators**: Update `market_data.py` to calculate RSI (14-day) and SMA (50-day) Deviation.
-- [] **Economic Calendar**: Create `automation/collectors/economic_calendar.py` to fetch upcoming major events (CPI, FOMC) for the next 14 days.
-- [] **Market Regime Logic (Cross-Asset)**: Implement `automation/analysis/market_regime.py` to define market environment (e.g., "Risk-On", "Inflation Scare") based on correlations (Stocks vs Yields, EM FX Risk).
-- [] **Workflow Automation**: Create `.github/workflows/daily-briefing.yml` with Git commit persistence for JSON data to enable efficient caching across runs.
+- [x] **Technical Indicators**: Update `market_data.py` to calculate RSI (14-day) and SMA (50-day) Deviation.
+- [x] **Economic Calendar**: Create `automation/collectors/economic_calendar.py` to fetch upcoming major events (CPI, FOMC) for the next 14 days.
+- [x] **Market Regime Logic (Cross-Asset)**: Implement `automation/analysis/market_regime.py` (Integrated into `daily_briefing.py` & `gemini_client.py`) to define market environment (e.g., "Risk-On", "Inflation Scare") based on correlations (Stocks vs Yields, EM FX Risk).
+- [ ] **Workflow Automation**: Create `.github/workflows/daily-briefing.yml` with Git commit persistence for JSON data to enable efficient caching across runs.
 
 ### 3.6. Daily Briefing Implementation (New Architecture)
 **N対1 (複数記事→1記事)** の集約生成ロジックを実装します（設計書: `docs/02_design/daily_briefing_logic.md`）。
 
-- [ ] **Data Integration**:
+- [x] **Data Integration**:
     - `market_data.py` (市況データ) と `sentiment_analyzer.py` (AIセンチメント) の出力をコンテキストとして利用できるように統合。
-- [ ] **New Aggregator Script (`daily_briefing.py`)**:
+- [x] **New Aggregator Script (`daily_briefing.py`)**:
     - 過去24時間の記事を収集し、重要度順にソート・フィルタリングするロジック。
     - 取得した記事群を要約し、1つの「Market Context JSON」に合成する処理。
-- [ ] **Component Updates**:
+    - **Features**: JP/US/Crypto Region support, Local file output, Multi-metaphor image generation.
+- [x] **Component Updates**:
     - **`generate_article.py`**: 複数記事の要約リストを含む複雑なJSONコンテキストを受け取れるように改修。
-    - **`gemini_client.py`**: 新規プロンプト `market-analysis-briefing` を追加。個別のニュースの羅列ではなく、市場全体の「Trend」と「Key Drivers」を合成して語るプロンプトを作成。
+    - **`gemini_client.py`**: 新規プロンプト `write_briefing` を追加。個別のニュースの羅列ではなく、市場全体の「Trend」と「Key Drivers」を合成して語るプロンプトを作成。
 
 ### 3.5. WordPress Theme Integration (`/themes`)
 Automationと密接に連携するテーマ側の実装要件です。
-Phase 4での実装を予定していますが、Automation側のデータ出力仕様に関わるため記載します。
+**Status: In Progress**
 
-#### [NEW] `themes/finshift/`
+#### [COMPLETED] `themes/finshift/`
 - **デザインコンセプト**: "Financial Terminal" (Bloomberg/Reuters風)。ダークモード基調、情報密度高め（High Data Density）。
+- **Basic Setup**: Logishiftからの移行・リネーム完了。
+- **CSS Refactoring**: 不要スタイルの削除、配色コンフリクトの解消、可読性向上完了。
 
 #### **A. フロントページ (`front-page.php`)**
-- [ ] **First View (Market Dashboard)**:
-    - **Global Ticker**: 主要指数（S&P500, Nasdaq, Nikkei, Nifty50, Shanghai Comp）のリアルタイムレート (TradingView Widget利用)。
-    - **Market Sentiment**: Automationが集計した「本日の市場センチメント(Fear & Greed)」を表示。
-        - *Automation要件*: `wp_options` または専用CPTにセンチメント数値を保存する処理。
-- [ ] **Daily Briefing Section**:
-    - 各国（US, CN, IN, JP, ID）の「最新のデイリー記事」をカード表示。
-    - 「今日のシナリオ」を要約表示（カスタムフィールド `scenario_summary` を利用）。
-- [ ] **Latest News Feed**:
-    - タブ切り替え（All / Stocks / Crypto / FX）。
+- [x] **First View (Market Dashboard)**:
+    - **Global Ticker**: 主要指数のTradingView Widget実装完了。
+    - **Market Sentiment**: Automationが集計したデータを表示するUI枠実装完了。
+        - [x] *Next*: Automation側から `_finshift_sentiment` post_meta への保存フローの実機検証。
+- [x] **Daily Briefing Section**:
+    - "Today's Market Scenarios" として実装完了。
+- [x] **Latest News Feed**:
+    - 実装完了。
+- [x] **Tab UI**:
+    - Global Trends, Theme, Industry タブの実装完了。
+- [x] **Navigation Updates**:
+    - ヘッダー・フッターのメニューリンク（`header.php`, `footer.php`）を、タグアーカイブ（`/tag/us-market`）から新設する市場別ページ（`/markets/us`）へ変更する。
 
-#### **B. 市場別ランディングページ (`page-market.php`)**
-- [ ] **Template Hierarchy**: `page-india.php`, `page-usa.php` 等、スラッグで分岐または共通テンプレートでクエリ制御。
-- [ ] **Components**:
-    - **Regional Chart**: その国の代表指数のTradingViewチャート (Large size)。
-    - **Key Metrics**: PER, PBR, 配当利回りなどの国別平均指標（手動更新またはAutomationで取得）。
-    - **Related Articles**: その地域タグ (`India`) が付いた記事のみを表示。
+#### **B. 市場別ランディングページ (Market Dashboard Pages)**
+*Status: Initial Implementation Complete (Design Refinement Needed)*
+
+- [x] **Implementation Strategy**:
+    - **URL構造**: `/markets/india`, `/markets/us` 等の固定ページを作成。
+    - **共通テンプレート**: `page-templates/market-dashboard.php` を作成し、固定ページに適用。
+    - **Custom Fields**: 各ページの「国タグスラッグ（例: `india-market`）」や「TradingViewシンボル」をカスタムフィールドで指定してコンテンツを出し分ける。
+
+- [x] **Components** (テンプレート内要素):
+    - **Hero Chart**: その国の代表指数のTradingViewチャート (Large size / Advanced Chart)。
+    - **Key Metrics Panel**: PER, PBR, 配当利回り, 政策金利などの国別指標表示エリア（手動更新可）。
+    - **Sentiment Meter**: その市場のFear & Greed（または独自センチメント）表示。
+    - **Filtered News Feed**: その国タグ (`india-market` 等) が付いた記事のみを自動抽出して表示。
+
+#### **[NEW] Design Refinements**
+- [ ] **Market Page Styling**:
+    - レイアウト崩れの修正。
+    - 各セクション（Briefing, News）の余白とタイポグラフィの調整。
+    - モバイルレスポンシブ対応の確認。
 
 #### **C. 記事詳細ページ (`single.php`)**
+- [x] **Market Meta**:
+    - タイトル下に `Regime` バッジと `Sentiment` チップを表示するUI実装完了。
 - [ ] **Sidebar**:
     - 関連銘柄のミニチャート表示（記事内の銘柄コード `TATA.NS` 等を自動検出してWidget化）。
     - *Automation要件*: 記事生成時に銘柄コードを抽出・タグ保存するロジック (`tags` or `custom_field`)。

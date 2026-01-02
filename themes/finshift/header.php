@@ -11,6 +11,7 @@
 	<meta charset="<?php bloginfo( 'charset' ); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="profile" href="https://gmpg.org/xfn/11">
+	<link rel="icon" href="<?php echo get_template_directory_uri(); ?>/assets/images/favicon.svg" type="image/svg+xml">
 
 	<?php wp_head(); ?>
 </head>
@@ -27,11 +28,11 @@
 				the_custom_logo();
 				if ( is_front_page() && is_home() ) :
 					?>
-					<h1 class="site-title">
-						<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
-							<img src="<?php echo get_template_directory_uri(); ?>/assets/images/logo.svg" alt="<?php bloginfo( 'name' ); ?>" style="height: 40px; width: auto;">
-						</a>
-					</h1>
+				<h1 class="site-title">
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home">
+						<img src="<?php echo get_template_directory_uri(); ?>/assets/images/logo.svg" alt="FinShift" style="height: 40px; width: auto; display: block;">
+					</a>
+				</h1>
 					<?php
 				else :
 					?>
@@ -53,19 +54,20 @@
 
 			<nav id="site-navigation" class="main-navigation">
 				<button class="menu-toggle" aria-controls="primary-menu" aria-expanded="false">
-					<span class="screen-reader-text"><?php esc_html_e( 'Menu', 'logishift' ); ?></span>
+					<span class="screen-reader-text"><?php esc_html_e( 'Menu', 'finshift' ); ?></span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
 				</button>
 				<ul id="primary-menu" class="menu">
-					<li><a href="<?php echo esc_url( home_url( '/?cat=11' ) ); ?>"><?php esc_html_e( '物流DX・トレンド', 'logishift' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/?cat=12' ) ); ?>"><?php esc_html_e( '倉庫管理・WMS', 'logishift' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/?cat=13' ) ); ?>"><?php esc_html_e( '輸配送・TMS', 'logishift' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/?cat=14' ) ); ?>"><?php esc_html_e( 'マテハン・ロボット', 'logishift' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/?cat=15' ) ); ?>"><?php esc_html_e( 'サプライチェーン', 'logishift' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/?cat=17' ) ); ?>"><?php esc_html_e( '海外トレンド', 'logishift' ); ?></a></li>
-					<li><a href="<?php echo esc_url( home_url( '/?cat=16' ) ); ?>"><?php esc_html_e( '事例', 'logishift' ); ?></a></li>
+					<li><a href="<?php echo esc_url( home_url( '/category/market-analysis/' ) ); ?>">Market Analysis</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/us/' ) ); ?>">US Market</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/japan/' ) ); ?>">JP Market</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/india/' ) ); ?>">India</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/china/' ) ); ?>">China</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/crypto/' ) ); ?>">Crypto</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/forex/' ) ); ?>">FX</a></li>
+					<li><a href="<?php echo esc_url( home_url( '/category/investment-guide/' ) ); ?>">Guide</a></li>
 				</ul>
 			</nav><!-- #site-navigation -->
 		</div>

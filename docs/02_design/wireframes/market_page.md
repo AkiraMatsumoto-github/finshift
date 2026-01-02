@@ -1,66 +1,96 @@
-# Wireframe: Market Landing Page
+# Wireframe: Market Dashboard Page
 
 ## 概要
-- **ファイル名**: `page-market.php` (e.g., `/market/india/`, `/market/usa/`)
-- **役割**: 特定の国・市場の「現在地」を深く知るためのダッシュボード。
-- **デザインコンセプト**: TradingView Widgetを中心とした「コックピット」感。
+- **テンプレート**: `page-templates/market-dashboard.php`
+- **役割**: 特定の国・市場（インド・米国・中国etc）の「ダッシュボード」。
+- **構成**: チャート、重要指標、そして「市況解説 (Daily)」と「個別ニュース (Featured)」を明確に分ける。
 
-## Layout (Mobile First)
+## Layout Structure (Mobile First)
 
 ```text
 +--------------------------------------------------+
 | [Header (Sticky)]                                |
 | [ < ]  INDIA MARKET 🇮🇳  [🔍]                   |
-| ------------------------------------------------ |
-| [Risk Monitor Bar (Sticky)]                      |
-| BTC: +2.1% ▲ | Gold: -0.5% ▼ | Oil: +1.2% ▲      |
 +--------------------------------------------------+
-| [Hero Chart (TradingView Widget)]                |
-|  Symbol: BSE:SENSEX (India)                      |
-|  Timeframe: [1D] [1W] [1M] [3M] [YTD]            |
-|  [Interactive Chart Area .....................]  |
-|  [............................................]  |
-|  Current: 72,500 (+1.2%)                         |
-+--------------------------------------------------+
-| [Key Metrics Grid]                               |
-| +---------------------+ +----------------------+ |
-| | P/E Ratio (PER)     | | P/B Ratio (PBR)      | |
-| | 24.5x               | | 3.2x                 | |
-| +---------------------+ +----------------------+ |
-| +---------------------+ +----------------------+ |
-| | 10Y Yield           | | USD/INR              | |
-| | 7.15%               | | 83.20                | |
-| +---------------------+ +----------------------+ |
-+--------------------------------------------------+
-| [AI Market Analysis]                             |
-| [Icon: Robot]                                    |
-| "最高値圏での推移が続くが、RSIは75と過熱感あり。 |
-|  内需株への資金循環が支えとなっている..."        |
-+--------------------------------------------------+
-| [Latest Articles: #India]                        |
-|                                                  |
+| [Market Pulse Section]                           |
 | +----------------------------------------------+ |
-| | [Thumb]                                      | |
-| | TATA Motors Earnings Report Q4               | |
-| | [Tag: Auto] [Tag: Earnings]                  | |
+| | [Region Hero Chart (TradingView)]            | |
+| | Symbol: BSE:SENSEX (India)                   | |
+| | [Interactive Chart Area ...................] | |
+| | Current: 72,500 (+1.2%)                      | |
 | +----------------------------------------------+ |
 |                                                  |
+| [Key Metrics Panel (Horizontal Scroll)]          |
+| +----------+  +----------+  +----------+         |
+| | Trend    |  | RSI      |  | Mom (1M) |         |
+| | +2.3%    |  | 68       |  | +5.4%    |         |
+| +----------+  +----------+  +----------+         |
+|                                                  |
+| [ Today's Scenarios (Latest Briefing) ]          |
 | +----------------------------------------------+ |
-| | [Thumb]                                      | |
-| | HDFC Bank Merger Update                      | |
-| | [Tag: Finance]                               | |
+| | 🟢 **Bull**: 銀行株への資金流入が継続すれば一段高 | |
+| | 🔴 **Bear**: 原油価格が80ドルを超えると警戒感    | |
 | +----------------------------------------------+ |
-| ...                                              |
-| [View All India News >]                          |
+| [ Read Full Analysis > ]                         |
+|                                                  |
 +--------------------------------------------------+
-| [Related Assets] (Mini Tickers)                  |
-| Nifty 50 | Reliance Ind | Infosys | Wipro        |
+| [Daily Briefing Corner] (Market Analysis)        |
+|                                                  |
+| +----------------------------------------------+ |
+| | [Card: Latest Market Analysis]               | |
+| | [Label: RISK-ON] [Sent: 82 (Greed)]          | |
+| | 2025.12.31 🇮🇳                                | |
+| | **インド株、最高値更新。TATA好決算が寄与**     | |
+| |                                                | |
+| | > Read Full Analysis                           | |
+| +----------------------------------------------+ |
++--------------------------------------------------+
+| [Featured News Corner] (Individual Stocks)       |
+|                                                  |
+| +----------------------------------------------+ |
+| | [Thumb] [Tag: Auto]                          | |
+| | TATA Motors、EV部門の売上が倍増               | |
+| | 2025.12.31                                   | |
+| +----------------------------------------------+ |
+| | [Thumb] [Tag: Policy]                        | |
+| | 印政府、半導体工場への補助金を拡大             | |
+| | 2025.12.30                                   | |
+| +----------------------------------------------+ |
+| | [Thumb] [Tag: Bank]                          | |
+| | HDFC Bank、デジタル決済の遅れで株価下落        | |
+| | 2025.12.29                                   | |
+| +----------------------------------------------+ |
+|                                                  |
+| [View More News >]                               |
 +--------------------------------------------------+
 | [Footer]                                         |
 +--------------------------------------------------+
 ```
 
-## Desktop Layout
-- **2 Column**:
-    - **Main (Left/Center)**: Large Chart, AI Analysis, Latest News.
-    - **Sidebar (Right)**: Components of the index (Top 10 Stocks ranking), Economic Calendar for this region.
+## Desktop Layout (2 Column)
+
+```text
++----------------------+ +-------------------------+
+|      MAIN COLUMN     | |      SIDEBAR            |
+|                      | |                         |
+| [Hero Chart Area]    | | [Global Ticker Vertical]|
+| [Key Metrics]        | |                         |
+|                      | | [AdSense / Promotion]   |
+| [Daily Briefing]     | |                         |
+|  (Large Card)        | | [Ranking Widget]        |
+|                      | | 1. TATA Motors          |
+| [Featured News Grid] | | 2. Infosys              |
+|  [Card] [Card]       | | 3. Adani Green        |
+|  [Card] [Card]       | |                         |
++----------------------+ +-------------------------+
+```
+
+## UI Components
+1.  **Hero Chart**: `TradingView Widget` (Advanced Real-time Chart).
+2.  **Metrics Chips**: シンプルな統計情報表示。カスタムフィールドで管理。
+3.  **Daily Briefing**:
+    - Query: `category_name=market-analysis` & `tag={region}`
+    - Display: 最新1件を大きく表示。
+4.  **Featured News**:
+    - Query: `category_name=featured-news` & `tag={region}`
+    - Display: グリッドレイアウトで複数表示。

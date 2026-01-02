@@ -54,14 +54,14 @@ get_header();
 				<div class="ranking-block" id="ranking-block-<?php echo esc_attr( $days ); ?>" style="display: <?php echo $display_style; ?>;">
 					
 					<p class="ranking-period-info" style="text-align: center; color: #888; margin-bottom: 20px; font-size: 0.9em;">
-						<?php printf( esc_html__( '集計期間: %s 〜 %s', 'logishift' ), $start_date, $end_date ); ?>
+						<?php printf( esc_html__( '集計期間: %s 〜 %s', 'finshift' ), $start_date, $end_date ); ?>
 					</p>
 
 					<div class="featured-grid">
 						<?php
-						if ( function_exists( 'logishift_get_popular_posts' ) ) {
+						if ( function_exists( 'finshift_get_popular_posts' ) ) {
 							// Get top 20 posts for this period
-							$popular_posts = logishift_get_popular_posts( $days, 20 );
+							$popular_posts = finshift_get_popular_posts( $days, 20 );
 
 							if ( ! empty( $popular_posts ) ) {
 								$rank = 1;
@@ -102,7 +102,7 @@ get_header();
 								endforeach;
 								wp_reset_postdata();
 							} else {
-								echo '<p style="text-align:center; width:100%;">' . esc_html__( '集計データがありません。', 'logishift' ) . '</p>';
+								echo '<p style="text-align:center; width:100%;">' . esc_html__( '集計データがありません。', 'finshift' ) . '</p>';
 							}
 						}
 						?>

@@ -83,6 +83,7 @@ def fetch_data():
             name = asset["name"]
             
             try:
+                print(f"DEBUG: Processing {symbol}...")
                 # Get history
                 # We need at least 3mo of data for 50-day SMA and 14-day RSI
                 ticker = tickers.tickers[symbol]
@@ -110,6 +111,23 @@ def fetch_data():
                 if not pd.isna(current_sma) and current_sma != 0:
                     sma_dev = ((current_price - current_sma) / current_sma) * 100
                 
+                # 3. Volatility (HV - Historical Volatility)
+                # Annualized Standard Deviation of Log Returns (20-day window usually)
+                # Using simple percentage change for approximation if simpler, but log returns are standard.
+                # HV = std(ln(P_t / P_t-1)) * sqrt(252) * 100
+                
+                # Using pct_change() as a close proxy for log returns for small changes, or actual log returns.
+                # Let's use simple pct_change std dev for robustness with minimal deps if numpy not heavy used, 
+                # but standard is:
+                import numpy as np
+                log_returns = np.log(hist['Close'] / hist['Close'].shift(1))
+                # 20-day rolling standard deviation
+                volatility_window = 20
+                rolling_std = log_returns.rolling(window=volatility_window).std()
+                # Annualize (assuming 252 trading days)
+                annualized_vol = rolling_std * np.sqrt(252) * 100
+                current_vol = annualized_vol.iloc[-1]
+
                 # --- Price Changes ---
                 
                 # 1 Day Ago (iloc[-2])
@@ -129,6 +147,7 @@ def fetch_data():
                 data_point = {
                     "symbol": symbol,
                     "name": name,
+                    "region": asset.get("region", "Global"),
                     "price": round(current_price, 2),
                     "changes": {
                         "1d": round(change_1d, 2),
@@ -137,17 +156,101 @@ def fetch_data():
                     },
                     "technical": {
                         "rsi": round(current_rsi, 1) if not pd.isna(current_rsi) else None,
-                        "sma_50_dev": round(sma_dev, 2) if not pd.isna(sma_dev) else None
+                        "sma_50_dev": round(sma_dev, 2) if not pd.isna(sma_dev) else None,
+                        "volatility": round(current_vol, 1) if not pd.isna(current_vol) else 0.0
                     },
                     "last_close_date": hist.index[-1].strftime('%Y-%m-%d')
                 }
                 results["data"][category].append(data_point)
-                print(f"Fetched {name}: {data_point['price']} (RSI: {data_point['technical']['rsi']})")
+                print(f"Fetched {name}: {data_point['price']} (RSI: {data_point['technical']['rsi']}, HV: {data_point['technical']['volatility']}%)")
                 
             except Exception as e:
                 print(f"Error fetching {symbol}: {e}")
                 
     return results
+
+def update_wp_market_pages(data):
+    """
+    Update WordPress Market Pages with fetched metrics.
+    Maps regions to page slugs and updates meta.
+    """
+    print("\n--- Updating WordPress Market Pages ---")
+    try:
+        from automation.wp_client import WordPressClient
+        wp = WordPressClient()
+    except ImportError:
+        # Fallback for running from different dir
+        sys.path.append(os.path.join(os.getcwd()))
+        try:
+            from automation.wp_client import WordPressClient
+            wp = WordPressClient()
+        except ImportError:
+            print("WordPressClient not found. Skipping WP update.")
+            return
+
+    # Map Regions to specific index symbols for metrics
+    # usage: Region -> Symbol in fetched data to use for Page Metrics
+    REGION_MAP = {
+        "us-market": "^GSPC",    # US Market Page uses S&P 500 metrics
+        "japan-market": "^N225", # JP Market Page uses Nikkei 225
+        "india-market": "^NSEI", # India Market Page uses Nifty 50
+        "china-market": "000001.SS", # China uses Shanghai Composite
+        # "global": "^VIX"       # Maybe for global page?
+    }
+
+    # Flatten data for easy lookup by symbol
+    flat_data = {}
+    for cat, items in data["data"].items():
+        for item in items:
+            flat_data[item["symbol"]] = item
+
+    for region_slug, symbol in REGION_MAP.items():
+        if symbol not in flat_data:
+            print(f"Skipping {region_slug}: Data for {symbol} not found.")
+            continue
+            
+        metric_data = flat_data[symbol]
+        
+        # Prepare Meta Data
+        # Mapping:
+        # _metric_trend -> 1 Month Change % (Formatted as string with % and sign)
+        # _metric_rsi   -> RSI (Formatted as string)
+        # _metric_mom   -> Momentum/SMA Dev (Formatted with % and sign)
+        
+        trend_val = metric_data["changes"]["1m"]
+        rsi_val = metric_data["technical"]["rsi"]
+        mom_val = metric_data["technical"]["sma_50_dev"]
+        vol_val = metric_data["technical"]["volatility"]
+        
+        meta_update = {
+            "_metric_trend": f"{trend_val:+.2f}%" if trend_val is not None else "",
+            "_metric_rsi": str(rsi_val) if rsi_val is not None else "",
+            "_metric_mom": f"{mom_val:+.2f}%" if mom_val is not None else "",
+            "_metric_volatility": f"{vol_val:.1f}%" if vol_val is not None else ""
+        }
+        
+        # Find Page
+        print(f"Updating {region_slug} with data from {symbol}...")
+        pages = wp.get_pages_by_meta("market_region_tag", region_slug)
+        
+        if not pages:
+            print(f"  No page found for tag: {region_slug}")
+            continue
+            
+        for page in pages:
+            print(f"  Found page: {page['title']['rendered']} (ID: {page['id']})")
+            # Update Meta
+            # Note: updating 'meta' via REST API requires keys to be registered or using specific endpoint.
+            # Our custom metabox saves to post_meta. 
+            # The standard 'meta' field in REST API needs 'show_in_rest' => true in register_meta.
+            # If not registered, we might need a custom endpoint or authenticated update might work if schema allows.
+            # Let's try standard update first.
+            result = wp.update_resource('pages', page['id'], {"meta": meta_update})
+            
+            if result:
+                print(f"  ✅ Updated metadata for {page['title']['rendered']}")
+            else:
+                print(f"  ❌ Failed to update {page['title']['rendered']}")
 
 def save_json(data, filename="risk_monitor.json"):
     # Save to Theme Directory
@@ -165,6 +268,13 @@ def main():
     ensure_dirs()
     data = fetch_data()
     save_json(data)
+    
+    # Push to WordPress
+    try:
+        update_wp_market_pages(data)
+    except Exception as e:
+        print(f"Error updating WordPress: {e}")
+        
     print("Market data update complete.")
 
 if __name__ == "__main__":

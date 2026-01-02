@@ -916,6 +916,7 @@ section {
 /* Archive Pages */
 .archive-hero {
     background: var(--gradient-hero);
+    color: var(--color-white);
     padding: var(--spacing-3xl) 0;
     text-align: center;
     margin-bottom: var(--spacing-xl);
@@ -925,6 +926,7 @@ section {
     font-size: 2.0rem;
     margin-bottom: var(--spacing-md);
     margin-top: var(--spacing-md);
+    color: var(--color-white);
     font-weight: 800;
 }
 
@@ -1162,434 +1164,6 @@ section {
     background-color: var(--color-tech-blue);
     color: var(--color-white);
     border-color: var(--color-tech-blue);
-}
-
-/* =========================================
-   Market Dashboard Template
-   ========================================= */
-
-/* Layout & Grid System */
-.market-dashboard-page .site-content .container {
-    max-width: 1200px;
-    /* Limit width for better readability */
-}
-
-/* Header Section */
-.market-dashboard-page .market-header {
-    background-color: #fff;
-    padding: var(--spacing-lg) 0;
-    border-bottom: 1px solid var(--color-bg-tertiary);
-    margin-bottom: var(--spacing-xl);
-}
-
-.market-dashboard-page .market-title-box {
-    display: flex;
-    align-items: baseline;
-    gap: var(--spacing-md);
-}
-
-.market-dashboard-page .market-title {
-    font-size: 2rem;
-    font-weight: 800;
-    margin: 0;
-    color: var(--color-text-primary);
-}
-
-.market-dashboard-page .market-subtitle {
-    font-size: 1rem;
-    color: var(--color-text-secondary);
-    font-weight: 500;
-}
-
-/* Main Layout Grid */
-.market-dashboard-grid {
-    display: grid;
-    grid-template-columns: 1fr 300px;
-    gap: var(--spacing-xl);
-    align-items: start;
-    /* Ensure sidebar starts at top */
-}
-
-/* Today's Scenarios Panel (New) */
-.todays-scenarios-panel {
-    margin-top: 20px;
-    padding: 24px;
-    background: #ffffff;
-    border-radius: 16px;
-    border: 1px solid var(--color-border-gray);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-}
-
-.todays-scenarios-panel .panel-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-top: 0;
-    margin-bottom: 20px;
-    border-bottom: 2px solid var(--color-bg-secondary);
-    padding-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-/* Optional icon for title if needed, using ::before or keep simple */
-.todays-scenarios-panel .panel-title::before {
-    content: '';
-    display: inline-block;
-    width: 6px;
-    height: 18px;
-    background-color: var(--color-tech-blue);
-    border-radius: 2px;
-}
-
-.todays-scenarios-panel .scenario-row {
-    display: flex;
-    align-items: baseline;
-    gap: 16px;
-    margin-bottom: 16px;
-    padding-bottom: 16px;
-    border-bottom: 1px dashed var(--color-bg-tertiary);
-}
-
-.todays-scenarios-panel .scenario-row:last-of-type {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.todays-scenarios-panel .scenario-label {
-    flex-shrink: 0;
-    padding: 6px 0;
-    border-radius: 6px;
-    font-size: 0.8rem;
-    font-weight: 800;
-    color: #fff !important;
-    width: 70px;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.todays-scenarios-panel .scenario-label.bull {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
-}
-
-.todays-scenarios-panel .scenario-label.bear {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
-}
-
-.todays-scenarios-panel .scenario-text {
-    font-size: 1rem;
-    color: var(--color-text-primary);
-    line-height: 1.6;
-    font-weight: 500;
-}
-
-.todays-scenarios-panel .scenario-link {
-    margin-top: 20px;
-    text-align: right;
-    font-size: 0.9rem;
-}
-
-.todays-scenarios-panel .scenario-link a {
-    color: var(--color-tech-blue);
-    text-decoration: none;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 16px;
-    background: var(--color-bg-secondary);
-    border-radius: 20px;
-    transition: all 0.2s ease;
-}
-
-.todays-scenarios-panel .scenario-link a:hover {
-    background: var(--color-tech-blue);
-    color: #fff;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 180, 216, 0.2);
-}
-
-@media (max-width: 900px) {
-    .market-dashboard-grid {
-        grid-template-columns: 1fr;
-        /* Stack on mobile/tablet */
-    }
-}
-
-/* Charts & Metrics Section (Main Column) */
-.market-pulse-section {
-    background: transparent;
-    /* Remove wrapper background */
-    padding: 0;
-    margin-bottom: var(--spacing-xl);
-}
-
-.market-hero-chart {
-    background: #fff;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: var(--spacing-md);
-    box-shadow: var(--shadow-sm);
-    border: 1px solid var(--color-bg-tertiary);
-}
-
-/* Metrics Panel */
-.market-metrics-panel {
-    background: #fff;
-    border: 1px solid var(--color-bg-tertiary);
-    border-radius: var(--radius-md);
-    padding: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
-}
-
-.metrics-scroller {
-    display: flex;
-    gap: var(--spacing-lg);
-    justify-content: space-between;
-    /* Spread items */
-    flex-wrap: wrap;
-    /* Allow wrapping */
-}
-
-.metric-card {
-    display: flex;
-    flex-direction: column;
-    min-width: 100px;
-}
-
-.m-label {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    font-weight: 600;
-    margin-bottom: 4px;
-}
-
-.m-value {
-    font-size: 1.4rem;
-    font-weight: 700;
-    line-height: 1.2;
-    font-family: 'Inter', sans-serif;
-}
-
-.m-value.bull {
-    color: var(--color-bull);
-}
-
-.m-value.bear {
-    color: var(--color-bear);
-}
-
-.m-value.neutral {
-    color: var(--color-neutral);
-}
-
-/* Section Headers */
-.section-header-styled {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: var(--spacing-md);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 2px solid var(--color-bg-secondary);
-}
-
-.section-header-styled h2 {
-    font-size: 1.4rem;
-    margin: 0;
-    font-weight: 700;
-    border-left: 5px solid var(--color-primary);
-    /* Unified blue border */
-    padding-left: 12px;
-    line-height: 1.2;
-}
-
-/* Daily Briefing */
-.daily-briefing-wrapper {
-    margin-bottom: var(--spacing-xl);
-}
-
-.daily-briefing-card {
-    background: #fff;
-    border: 1px solid var(--color-bg-tertiary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-lg);
-    box-shadow: var(--shadow-sm);
-    margin-bottom: var(--spacing-lg);
-}
-
-.daily-briefing-card:last-child {
-    margin-bottom: 0;
-}
-
-.briefing-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-md);
-    border-bottom: 1px solid var(--color-bg-secondary);
-    padding-bottom: var(--spacing-sm);
-}
-
-.briefing-date {
-    font-size: 0.9rem;
-    color: var(--color-text-muted);
-    font-weight: 500;
-}
-
-.briefing-badges {
-    display: flex;
-    gap: 8px;
-}
-
-.briefing-title {
-    font-size: 1.6rem;
-    margin-bottom: var(--spacing-md);
-    line-height: 1.4;
-    font-feature-settings: "palt";
-}
-
-.briefing-scenarios-box {
-    background: var(--color-bg-secondary);
-    padding: var(--spacing-md);
-    border-radius: var(--radius-md);
-    margin-top: var(--spacing-md);
-}
-
-.scenario-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-    line-height: 1.5;
-}
-
-.scenario-label {
-    font-weight: 700;
-    white-space: nowrap;
-    min-width: 60px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    text-align: center;
-}
-
-.scenario-label.bull {
-    background: rgba(34, 197, 94, 0.1);
-    color: var(--color-bull);
-}
-
-.scenario-label.bear {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--color-bear);
-}
-
-/* Sidebar Ranking */
-.market-sidebar {
-    position: sticky;
-    /* Keep visible when scrolling */
-    top: 20px;
-}
-
-.sidebar-widget-box {
-    background: #fff;
-    border: 1px solid var(--color-bg-tertiary);
-    border-radius: var(--radius-lg);
-    padding: var(--spacing-md);
-    box-shadow: var(--shadow-sm);
-}
-
-.sidebar-widget-box .widget-title {
-    /* Specificity for sidebar widget title */
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: var(--spacing-md);
-    border-left: 5px solid var(--color-text-primary);
-    /* Darker border for sidebar */
-    padding-left: 10px;
-    border-bottom: none;
-    /* Ensure no extra border */
-}
-
-.ranking-item {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-    align-items: center;
-    font-size: 0.95rem;
-    border-bottom: 1px dashed var(--color-bg-secondary);
-    padding-bottom: 8px;
-    text-decoration: none;
-    color: var(--color-text-primary);
-    transition: color 0.2s;
-}
-
-.ranking-item:hover {
-    color: var(--color-primary);
-}
-
-.rank-number {
-    font-weight: 800;
-    min-width: 24px;
-    height: 24px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--color-bg-secondary);
-    border-radius: 50%;
-    font-size: 0.8rem;
-}
-
-.rank-1 {
-    color: #fff;
-    background: #d4af37;
-}
-
-.rank-2 {
-    color: #fff;
-    background: #c0c0c0;
-}
-
-.rank-3 {
-    color: #fff;
-    background: #cd7f32;
-}
-
-/* Article List (Simple) */
-.market-article-item {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
-    text-decoration: none;
-    color: inherit;
-}
-
-.market-article-thumb {
-    width: 120px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: var(--radius-md);
-    background: var(--color-bg-tertiary);
-}
-
-.market-article-content {
-    flex: 1;
-}
-
-.market-article-title {
-    font-size: 1rem;
-    font-weight: 700;
-    margin: 0 0 5px 0;
-    line-height: 1.4;
-}
-
-.market-article-date {
-    font-size: 0.8rem;
-    color: var(--color-text-muted);
 }
 
 /* Single Page Styles */
@@ -2519,29 +2093,19 @@ section {
 
 .dashboard-card {
     background-color: var(--color-bg-card);
+    /* Darker/Lighter card bg */
     border: 1px solid var(--color-bg-tertiary);
     border-radius: var(--radius-lg);
     padding: var(--spacing-md);
     display: flex;
     flex-direction: column;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-    position: relative;
-    /* For overlay link */
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .dashboard-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
     border-color: var(--color-accent);
-}
-
-.card-overlay-link {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
 }
 
 .dashboard-card-header {
@@ -2562,38 +2126,26 @@ section {
     letter-spacing: 0.05em;
 }
 
+.date-badge {
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+}
+
 .dashboard-metrics {
     display: grid;
-    grid-template-columns: 80px 1fr 1fr;
-    /* Fixed width for Region to ensure alignment across cards */
-    /* Region (auto), Regime, Sentiment */
+    grid-template-columns: 1fr 1fr;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
     background-color: var(--color-bg-secondary);
     padding: var(--spacing-sm);
     border-radius: var(--radius-md);
-    width: 100%;
 }
 
 .metric-box {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    /* Center content vertically */
     text-align: center;
-    width: 100%;
-}
-
-.metric-box.region-box {
-    border-right: 1px solid var(--color-bg-tertiary);
-    padding-right: 12px;
-    margin-right: 4px;
-}
-
-/* Regime Box (2nd child) - Add separator */
-.dashboard-metrics .metric-box:nth-child(2) {
-    border-right: 1px solid var(--color-bg-tertiary);
 }
 
 .metric-label {
@@ -2604,20 +2156,10 @@ section {
     margin-bottom: 4px;
 }
 
-.region-badge-large {
-    font-weight: 800;
-    font-size: 1.2rem;
-    color: var(--color-text-primary);
-    /* Removed background/padding as requested */
-    background-color: transparent;
-    padding: 0;
-}
-
 .metric-value {
     font-weight: 700;
     font-size: 1.1rem;
     color: var(--color-text-primary);
-    line-height: 1.2;
 }
 
 .metric-value.regime-inflation {
@@ -2652,39 +2194,12 @@ section {
     color: var(--color-text-gray);
 }
 
-/* Scenario Teaser */
-.dashboard-scenario-teaser {
-    margin-bottom: 12px;
-    padding: 0;
-    background: none;
-    border: none;
-    font-size: 0.9rem;
-    color: var(--color-text-secondary);
-    /* Muted color for sub-text */
-    line-height: 1.5;
-
-    /* Line Clamp (3 lines) */
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-}
-
-.scenario-icon {
-    font-size: 1.1em;
-}
-
-.scenario-text {
-    font-weight: 500;
-    color: var(--color-text-primary);
-}
-
 .dashboard-title {
     font-size: 1.1rem;
     line-height: 1.4;
-    margin-bottom: var(--spacing-sm);
-    /* Reduce gap between title and teaser */
+    margin-bottom: var(--spacing-md);
     flex-grow: 1;
+    /* Pushes button to bottom */
 }
 
 .dashboard-title a {
@@ -2692,34 +2207,6 @@ section {
     text-decoration: none;
 }
 
-.dashboard-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    /* Force full width */
-    margin-top: auto;
-    padding-top: var(--spacing-sm);
-    border-top: 1px solid var(--color-bg-tertiary);
-    gap: 16px;
-    /* Fallback check */
-}
-
-.date-badge {
-    color: var(--color-text-muted);
-    font-family: var(--font-mono);
-    font-size: 0.85rem;
-    white-space: nowrap;
-}
-
-.read-briefing-text {
-    font-size: 0.9rem;
-    font-weight: 700;
-    color: var(--color-tech-blue);
-    transition: color 0.2s;
-    white-space: nowrap;
-}
-
-.dashboard-card:hover .read-briefing-text {
+.dashboard-title a:hover {
     color: var(--color-accent);
 }
