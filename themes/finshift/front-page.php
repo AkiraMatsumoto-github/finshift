@@ -188,7 +188,15 @@ get_header();
 				<?php
 				$news_query = new WP_Query([
 					'posts_per_page' => 6,
-					'ignore_sticky_posts' => 1
+					'ignore_sticky_posts' => 1,
+					'tax_query' => array(
+						array(
+							'taxonomy' => 'category',
+							'field'    => 'slug',
+							'terms'    => 'market-analysis',
+							'operator' => 'NOT IN',
+						),
+					),
 				]);
 				
 				if ( $news_query->have_posts() ) :

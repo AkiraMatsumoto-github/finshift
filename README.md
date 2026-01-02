@@ -76,6 +76,9 @@ python automation/daily_briefing.py --region US
 キーワードベースや従来のパイプライン処理を行います。
 
 ```bash
+# 基本実行
+python automation/pipeline.py --hours 12 --threshold 75 --limit 2
+
 # 全ソースから収集
 python automation/collector.py --source all > articles.json
 

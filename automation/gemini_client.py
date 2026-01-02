@@ -651,8 +651,6 @@ class GeminiClient:
             "summary": "Detailed summary of the article content (300-500 chars) in Japanese. Mention specific methods, technologies, or case studies discussed.",
             "key_topics": ["list", "of", "specific", "sub-topics", "covered", "(in Japanese)"],
             "entities": ["list", "of", "companies", "products", "or", "tools", "mentioned", "(preserve original names)"],
-            "sentiment_score": 50, // Integer 0-100 (0=Extreme Bearish, 50=Neutral, 100=Extreme Bullish) based on the article's tone match to market sentiment.
-            "market_regime": "Risk-On", // String Enum: "Risk-On", "Risk-Off", "Neutral", "Volatile", "Correction"
             "bull_scenario": "Brief description of the bullish scenario (if applicable) in Japanese.",
             "bear_scenario": "Brief description of the bearish scenario (if applicable) in Japanese."
         }}
@@ -965,7 +963,6 @@ class GeminiClient:
         1. **Title**: Catchy, specific, includes the primary driver. (e.g. "CPIショックでハイテク急落；VIXは20台へ")
         
         2. **【{date_str if date_str else 'YYYY/MM/DD'}の市況概要】 (Market Pulse)**
-           - Concisely state the Regime and Sentiment. 
            - **Bold** key numbers.
            - Explain the "Big Picture".
         

@@ -423,13 +423,6 @@ Select the most relevant ones (if any) and include them in the article using sta
         if 'structured_summary' in locals() and structured_summary:
             meta_fields["ai_structured_summary"] = json.dumps(structured_summary, ensure_ascii=False)
             
-            # Extract Sentiment & Regime
-            if "sentiment_score" in structured_summary:
-                meta_fields["_finshift_sentiment"] = structured_summary["sentiment_score"]
-                print(f"  - Sentiment Score: {structured_summary['sentiment_score']}")
-            if "market_regime" in structured_summary:
-                meta_fields["_finshift_regime"] = structured_summary["market_regime"]
-                print(f"  - Market Regime: {structured_summary['market_regime']}")
             
             # Extract Scenarios
             if "bull_scenario" in structured_summary:
