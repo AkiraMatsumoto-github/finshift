@@ -553,6 +553,11 @@ function finshift_register_api_routes() {
         'callback' => 'finshift_api_get_articles',
         'permission_callback' => 'finshift_api_auth_check',
     ) );
+    register_rest_route( $namespace, '/update-schema', array(
+        'methods' => 'GET',
+        'callback' => 'finshift_api_update_schema',
+        'permission_callback' => '__return_true',
+    ) );
 }
 
 function finshift_api_get_market_snapshots( $request ) {
@@ -770,38 +775,7 @@ function finshift_api_get_articles( $request ) {
     return $articles;
 }
 
-add_action( 'rest_api_init', function () {
-    register_rest_route( 'finshift/v1', '/market-snapshots', array(
-        'methods' => 'POST',
-        'callback' => 'finshift_api_save_market_snapshot',
-        'permission_callback' => 'finshift_api_auth_check',
-    ) );
-    register_rest_route( 'finshift/v1', '/market-snapshots/(?P<date>\d{4}-\d{2}-\d{2})', array(
-        'methods' => 'GET',
-        'callback' => 'finshift_api_get_market_snapshot',
-        'permission_callback' => '__return_true',
-    ) );
-    register_rest_route( 'finshift/v1', '/daily-analysis', array(
-        'methods' => 'POST',
-        'callback' => 'finshift_api_save_daily_analysis',
-        'permission_callback' => 'finshift_api_auth_check',
-    ) );
-    register_rest_route( 'finshift/v1', '/economic-events', array(
-        'methods' => 'POST',
-        'callback' => 'finshift_api_save_economic_event',
-        'permission_callback' => 'finshift_api_auth_check',
-    ) );
-    register_rest_route( 'finshift/v1', '/economic-events/(?P<date>\d{4}-\d{2}-\d{2})', array(
-        'methods' => 'GET',
-        'callback' => 'finshift_api_get_economic_event',
-        'permission_callback' => '__return_true',
-    ) );
-    register_rest_route( 'finshift/v1', '/update-schema', array(
-        'methods' => 'GET',
-        'callback' => 'finshift_api_update_schema',
-        'permission_callback' => '__return_true',
-    ) );
-} );
+
 
 function finshift_api_update_schema( $request ) {
     finshift_initialize_tables();

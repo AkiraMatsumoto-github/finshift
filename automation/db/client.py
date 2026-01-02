@@ -32,7 +32,10 @@ class DBClient:
             resp = requests.post(
                 f"{self.api_url}/{endpoint}", 
                 data=json.dumps(data, default=json_serial), 
-                headers={'Content-Type': 'application/json'},
+                headers={
+                    'Content-Type': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+                },
                 auth=self.auth
             )
             resp.raise_for_status()
@@ -40,12 +43,17 @@ class DBClient:
         except Exception as e:
             print(f"API Error (POST {endpoint}): {e}")
             if isinstance(e, requests.exceptions.HTTPError):
-                 print(f"Response: {e.response.text}")
+                 # Log only first 500 chars to avoid dumping full HTML
+                 error_preview = e.response.text[:500] + ("..." if len(e.response.text) > 500 else "")
+                 print(f"Response: {error_preview}")
             return None
 
     def _get(self, endpoint, params=None):
         try:
-            resp = requests.get(f"{self.api_url}/{endpoint}", params=params, auth=self.auth)
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }
+            resp = requests.get(f"{self.api_url}/{endpoint}", params=params, headers=headers, auth=self.auth)
             resp.raise_for_status()
             return resp.json()
         except Exception as e:
