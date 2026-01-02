@@ -290,7 +290,7 @@ def phase_2_analysis(args):
         reg_tag = wp.get_tag_id(region)
         if reg_tag: tag_ids.append(reg_tag)
         
-        status = "draft" 
+        status = "publish" 
         
         # Prepare Post Meta regardless of dry-run for verification
         # Extract Scenarios
