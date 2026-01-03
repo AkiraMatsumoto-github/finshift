@@ -195,6 +195,8 @@ def update_wp_market_pages(data):
         "japan-market": "^N225", # JP Market Page uses Nikkei 225
         "india-market": "^NSEI", # India Market Page uses Nifty 50
         "china-market": "000001.SS", # China uses Shanghai Composite
+        "indonesia-market": "^JKSE", # Indonesia uses IDX Composite
+        "crypto-market": "BTC-USD",  # Crypto uses Bitcoin
         # "global": "^VIX"       # Maybe for global page?
     }
 

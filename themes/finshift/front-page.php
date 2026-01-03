@@ -139,7 +139,7 @@ get_header();
                         <!-- Region -->
                         <div class="metric-box region-box">
 							<span class="metric-label">MKT</span>
-							<span class="region-badge-large"><?php echo esc_html($region_label); ?></span>
+							<span class="metric-value"><?php echo esc_html($region_label); ?></span>
 						</div>
                         <!-- Regime -->
 						<div class="metric-box">

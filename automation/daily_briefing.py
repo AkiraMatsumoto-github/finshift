@@ -131,6 +131,13 @@ def phase_1_collection(args):
             spx=spx,
             us10y=us10y
         )
+        # Update WordPress Market Pages with new KPIs
+        print(">> Updating WordPress Market Pages...")
+        try:
+             market_data.update_wp_market_pages(m_data)
+        except Exception as e:
+             print(f"Warning: Failed to update WP Market Pages: {e}")
+             
     print("Market snapshot saved.")
 
     # 3. Economic Calendar

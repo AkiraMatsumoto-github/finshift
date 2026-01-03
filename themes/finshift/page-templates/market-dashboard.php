@@ -113,6 +113,7 @@ if ( ! $region_tag_slug ) {
                     'japan-market' => 'jp',
                     'china-market' => 'cn',
                     'indonesia-market' => 'ID',
+                    'crypto-market'    => 'crypto',
                     'global'       => 'global'
                 ];
                 $query_tags = [ $region_tag_slug ];
@@ -201,14 +202,12 @@ if ( ! $region_tag_slug ) {
 
                         if ( $sentiment_score !== '' ) {
                             $score = (int)$sentiment_score;
+                            $sentiment = $score; // Display number
                             if ($score >= 60) {
-                                $sentiment = 'Bullish';
                                 $s_class = 'bull';
                             } elseif ($score <= 40) {
-                                $sentiment = 'Bearish';
                                 $s_class = 'bear';
                             } else {
-                                $sentiment = 'Neutral';
                                 $s_class = 'neutral';
                             }
                         }
@@ -218,9 +217,9 @@ if ( ! $region_tag_slug ) {
                             
                             <div class="dashboard-metrics">
                                 <!-- Region -->
-                                <div class="metric-box region-box">
+                                <div class="metric-box">
                                     <span class="metric-label">MKT</span>
-                                    <span class="region-badge-large"><?php echo esc_html($region_label); ?></span>
+                                    <span class="metric-value"><?php echo esc_html($region_label); ?></span>
                                 </div>
                                 <!-- Regime -->
                                 <div class="metric-box">

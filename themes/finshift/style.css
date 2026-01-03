@@ -2532,9 +2532,9 @@ section {
 
 .dashboard-metrics {
     display: grid;
-    grid-template-columns: 80px 1fr 1fr;
-    /* Fixed width for Region to ensure alignment across cards */
-    /* Region (auto), Regime, Sentiment */
+    grid-template-columns: repeat(3, 1fr);
+    /* Equal width for all 3 metrics */
+    /* Region, Regime, Sentiment */
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-md);
     background-color: var(--color-bg-secondary);
@@ -2553,14 +2553,8 @@ section {
     width: 100%;
 }
 
-.metric-box.region-box {
-    border-right: 1px solid var(--color-bg-tertiary);
-    padding-right: 12px;
-    margin-right: 4px;
-}
-
-/* Regime Box (2nd child) - Add separator */
-.dashboard-metrics .metric-box:nth-child(2) {
+/* Add separators between columns */
+.dashboard-metrics .metric-box:not(:last-child) {
     border-right: 1px solid var(--color-bg-tertiary);
 }
 
@@ -2570,15 +2564,6 @@ section {
     text-transform: uppercase;
     letter-spacing: 0.05em;
     margin-bottom: 4px;
-}
-
-.region-badge-large {
-    font-weight: 800;
-    font-size: 1.2rem;
-    color: var(--color-text-primary);
-    /* Removed background/padding as requested */
-    background-color: transparent;
-    padding: 0;
 }
 
 .metric-value {
