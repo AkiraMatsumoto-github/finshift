@@ -1574,6 +1574,16 @@ section {
     margin-bottom: var(--spacing-lg);
 }
 
+.entry-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
 .entry-title {
     font-size: 2.0rem;
     margin-bottom: var(--spacing-md);

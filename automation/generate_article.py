@@ -204,10 +204,11 @@ Select the most relevant ones (if any) and include them in the article using sta
 
 [Rules]
 1. PRIORITIZE specific, high-relevance articles.
-2. Format options:
-   - Inline: ... as discussed in [Topic Name](URL)...
-   - Block: See also: [Title](URL) at the end of sections.
+2. Format options (Must be consistent with Japanese context):
+   - Inline: ...[テーマ名](URL)の解説でも触れたように... (e.g., "As discussed in...")
+   - Block: **関連記事:** [Title](URL) (at the end of sections)
 3. If no article is strictly relevant, do not force a link.
+4. Ensure the introduction text for the link is natural Japanese.
 """
                 else:
                     print("No relevant internal links found.")
