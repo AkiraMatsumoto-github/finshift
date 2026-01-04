@@ -10,6 +10,7 @@ import os
 import json
 import hashlib
 import markdown
+import time
 from datetime import datetime, timedelta
 
 # Add parent dir to path
@@ -65,45 +66,57 @@ def phase_1_collection(args):
         print("No new articles to process.")
         # Proceed to market data anyway
     
-    # --- Optimization: Parallel Processing ---
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-    
-    def process_article(art):
-        """Worker function for threading"""
-        try:
-             # Relevance Check (AI)
-            is_relevant, reason = gemini.check_relevance(art['title'], art['summary'])
-            
-            # Save
-            article_record = {
-                "url_hash": art['url_hash'],
-                "title": art['title'],
-                "source": art['source'],
-                "region": art.get('region', 'Global'),
-                "published_at": art['published'],
-                "summary": art['summary'],
-                "is_relevant": is_relevant,
-                "relevance_reason": reason
-            }
-            if article_record['published_at'] == "Unknown":
-                 article_record['published_at'] = today_date
-            
-            if args.dry_run:
-                return f"[Dry-Run] Processed: {art['title']} (Relevant: {is_relevant})"
-            else:
-                 db.save_article(article_record)
-                 return f"Saved: {art['title'][:20]}... (Relevant: {is_relevant})"
-        except Exception as e:
-            return f"Error processing {art['title'][:20]}...: {e}"
+    # --- Optimization: Batch Processing ---
+    # from concurrent.futures import ThreadPoolExecutor, as_completed (Removed for Batch)
 
     if new_articles:
-        print(f"Processing {len(new_articles)} new articles with ThreadPool (max_workers=5)...")
+        print(f"Processing {len(new_articles)} new articles with Batch AI Check...")
         new_count = 0
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            future_to_art = {executor.submit(process_article, art): art for art in new_articles}
-            for future in as_completed(future_to_art):
-                print(future.result())
-                new_count += 1
+        batch_size = 20
+        
+        for i in range(0, len(new_articles), batch_size):
+            batch = new_articles[i:i+batch_size]
+            print(f" >> Sending Batch {i//batch_size + 1}/{(len(new_articles)-1)//batch_size + 1} ({len(batch)} articles)...")
+            
+            # 1. Batch AI Check
+            results_map = gemini.check_relevance_batch(batch)
+            
+            # 2. Process Results
+            for art in batch:
+                try:
+                    u_hash = art['url_hash']
+                    res = results_map.get(u_hash, {'is_relevant': False, 'reason': 'Batch Error/Missing'})
+                    
+                    is_relevant = res['is_relevant']
+                    reason = res['reason']
+                    
+                    # Save
+                    article_record = {
+                        "url_hash": u_hash,
+                        "title": art['title'],
+                        "source": art['source'],
+                        "region": art.get('region', 'Global'),
+                        "published_at": art['published'],
+                        "summary": art['summary'],
+                        "is_relevant": is_relevant,
+                        "relevance_reason": reason
+                    }
+                    if article_record['published_at'] == "Unknown":
+                         article_record['published_at'] = today_date
+                    
+                    if args.dry_run:
+                        print(f"[Dry-Run] Processed: {art['title'][:40]}... (Relevant: {is_relevant})")
+                    else:
+                         db.save_article(article_record)
+                         print(f"Saved: {art['title'][:30]}... (Relevant: {is_relevant})")
+                    
+                    new_count += 1
+                    
+                except Exception as e:
+                    print(f"Error processing {art['title'][:20]}...: {e}")
+            
+            # Small buffer between batches
+            time.sleep(2)
                 
         print(f"Finished processing {new_count} new articles.")
 

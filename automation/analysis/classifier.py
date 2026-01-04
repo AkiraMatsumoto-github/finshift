@@ -16,9 +16,14 @@ class ArticleClassifier:
     def __init__(self):
         self.gemini = GeminiClient()
         
-    def classify_article(self, title, content_summary):
+    def classify_article(self, title, content_summary, excluded_categories=None):
         """
         Classify an article into FinShift Category and Tags.
+        
+        Args:
+            title (str): Article title
+            content_summary (str): Article summary
+            excluded_categories (list): List of category slugs to exclude
         
         Returns:
             dict: {
@@ -26,6 +31,23 @@ class ArticleClassifier:
                 "tags": ["slug1", "slug2"]
             }
         """
+        
+        # Define available categories
+        categories = [
+            {"name": "Market Analysis", "slug": "market-analysis", "desc": "毎日の市況、全体の流れ、トレンド分析"},
+            {"name": "Featured News", "slug": "featured-news", "desc": "特定のニュース（決算、政策、M&A）の深掘り記事"},
+            {"name": "Strategic Assets", "slug": "strategic-assets", "desc": "仮想通貨・コモディティの分析記事"},
+            {"name": "Investment Guide", "slug": "investment-guide", "desc": "手法解説、ツール使い方、初心者向けガイド（ストック記事）"},
+        ]
+        
+        # Filter categories
+        if excluded_categories:
+            categories = [c for c in categories if c['slug'] not in excluded_categories]
+            
+        # Build category prompt string
+        category_prompt_str = ""
+        for c in categories:
+            category_prompt_str += f"- {c['name']} ({c['slug']}): {c['desc']}\n"
         
         prompt = f"""
         あなたは金融メディア「FinShift」の編集者です。
@@ -36,10 +58,7 @@ class ArticleClassifier:
         概要: {content_summary}
         
         ## 1. カテゴリ (必ず1つ選択)
-        - Market Analysis (market-analysis): 毎日の市況、全体の流れ、トレンド分析
-        - Featured News (featured-news): 特定のニュース（決算、政策、M&A）の深掘り記事
-        - Strategic Assets (strategic-assets): 仮想通貨・コモディティの分析記事
-        - Investment Guide (investment-guide): 手法解説、ツール使い方、初心者向けガイド（ストック記事）
+{category_prompt_str}
         
         ## 2. タグ (該当するものを全て選択)
         【地域】

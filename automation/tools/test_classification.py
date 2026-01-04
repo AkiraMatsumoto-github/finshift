@@ -11,16 +11,27 @@ load_dotenv(env_path, override=True)
 
 def test():
     client = GeminiClient()
-    print("Testing check_relevance...")
+    print("Testing check_relevance_batch...")
     
     title = "Bitcoin hits $100k all time high"
     summary = "Cryptocurrency markets rally as institutional adoption grows."
     
-    is_rel, reason = client.check_relevance(title, summary)
+    # Mock article dict
+    article = {
+        'url_hash': 'test_hash_123',
+        'title': title,
+        'summary': summary
+    }
+    
+    results_map = client.check_relevance_batch([article])
+    res = results_map.get('test_hash_123')
     
     print(f"Title: {title}")
-    print(f"Relevant: {is_rel}")
-    print(f"Reason: '{reason}'")
+    if res:
+        print(f"Relevant: {res['is_relevant']}")
+        print(f"Reason: '{res['reason']}'")
+    else:
+        print("Error: No result returned")
 
 if __name__ == "__main__":
     test()

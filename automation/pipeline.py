@@ -223,8 +223,9 @@ def main():
         # ---------------------------
         
         # Determine Category & Type
-        classification = classifier.classify_article(article['title'], article['summary'])
-        category_slug = classification.get('category', 'market-analysis')
+        # Exclude 'market-analysis' from pipeline generation as it's reserved for daily briefing
+        classification = classifier.classify_article(article['title'], article['summary'], excluded_categories=['market-analysis'])
+        category_slug = classification.get('category', 'featured-news') # Fallback changed
         
         # Map Category to Type
         # Direct mapping for FinShift

@@ -15,7 +15,7 @@ DEFAULT_SOURCES = {
 
     # --- Asia Strategy (Source of Competitive Advantage) ---
     # China (Native Sources - Deep Dive)
-    "36kr_china": "https://36kr.com/feed", # Tech & Startups (Unicorns) -> SUCCESS
+    "scmp_china": "https://www.scmp.com/rss/91/feed", # SCMP China Business (Active 2026)
     # "sina_finance_focus": "http://rss.sina.com.cn/news/allnews/finance.xml", # XML Error
     # "china_daily_biz": "http://www.chinadaily.com.cn/rss/bizchina_rss.xml", # XML Error
     # "xinhua_biz": "http://english.news.cn/rss/business.xml", # XML Error
@@ -42,7 +42,7 @@ DEFAULT_SOURCES = {
 REGION_MAPPING = {
     "US": ["yahoo_finance_top", "cnbc_world"],
     "JP": ["yahoo_jp_business"],
-    "CN": ["36kr_china"],
+    "CN": ["scmp_china"],
     "IN": ["economictimes"],
     "ID": ["antara_news_biz"],
     "Crypto": ["coindesk", "bitcoin_magazine"],

@@ -37,10 +37,10 @@ CONTENT_SELECTORS = {
     },
     
     # --- Asia Giants ---
-    "36kr_china": {
-        "content": "div.article-content, div.common-width-content",
-        "title": "h1.article-title",
-        "author": "a.author",
+    "scmp_china": {
+        "content": "div.article-body-text, div.details__body, article.article",
+        "title": "h1.article-title-text, h1.headline, h1",
+        "author": "span.author, a.author-link, div.article-attributes__author",
     },
     "sina_finance_focus": {
         "content": "div.article, div#artibody", 
@@ -120,7 +120,11 @@ def extract_content(url: str, source: str, rss_summary: Optional[str] = None) ->
     try:
         # Fetch URL
         headers = {
-            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.9,ja;q=0.8,zh-CN;q=0.7,zh;q=0.6,id;q=0.5,hi;q=0.4",
+            "Referer": "https://www.google.com/",
+            "Upgrade-Insecure-Requests": "1",
         }
         response = requests.get(url, headers=headers, timeout=10)
         # response.raise_for_status() # Don't raise immediately, handle 403/404 with fallback

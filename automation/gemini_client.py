@@ -827,13 +827,30 @@ class GeminiClient:
 
     # --- Daily Briefing Methods ---
 
-    def check_relevance(self, title, summary):
+
+
+    def check_relevance_batch(self, articles):
         """
-        Check if an article is relevant to financial markets/economy using Gemini Flash.
-        Returns: (is_relevant: bool, reason: str)
+        Check relevance for a batch of articles (list of dicts).
+        Each dict must have 'url_hash', 'title', 'summary'.
+        
+        Returns: Dict mapping url_hash -> {'is_relevant': bool, 'reason': str}
         """
+        if not articles:
+            return {}
+            
+        # Prepare input list for prompt
+        input_list = []
+        for art in articles:
+            input_list.append({
+                "id": art.get('url_hash', 'unknown'),
+                "title": art.get('title', ''),
+                "summary": art.get('summary', '')[:500] # Truncate summary for token efficiency
+            })
+            
         prompt = f"""
-        You are a financial news filter. Determine if the following article is relevant to **financial markets, economy, business, or investment**.
+        You are a financial news filter. 
+        Analyze the following list of articles and determine if EACH one is relevant to **financial markets, economy, business, or investment**.
         
         Criteria for "Relevant":
         - Reports on stock markets, companies, earnings, economic indicators (GDP, CPI), central banks.
@@ -846,33 +863,53 @@ class GeminiClient:
         - Shopping guides/reviews (unless significant for retail sector).
         - Career advice, HR tips, general "how to be productive".
         
-        Article:
-        Title: "{title}"
-        Summary: "{summary}"
+        Input Articles:
+        {json.dumps(input_list, ensure_ascii=False, indent=2)}
         
         Output JSON:
-        {{
-            "is_relevant": true/false,
-            "reason": "Brief explanation"
-        }}
+        A list of objects, one for each input article:
+        [
+            {{
+                "id": "article_id_from_input",
+                "is_relevant": true/false,
+                "reason": "Brief explanation"
+            }},
+            ...
+        ]
         """
         
         try:
             response = self._retry_request(
                 self.client.models.generate_content,
-                model='gemini-2.0-flash-exp', # Use fast model
+                model='gemini-2.0-flash-exp', 
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json"
                 )
             )
             res_json = json.loads(response.text)
-            return res_json.get('is_relevant', False), res_json.get('reason', 'Unknown')
+            
+            # Map back to url_hash
+            result_map = {}
+            for res in res_json:
+                u_hash = res.get('id')
+                if u_hash:
+                    result_map[u_hash] = {
+                        'is_relevant': res.get('is_relevant', False),
+                        'reason': res.get('reason', 'Unknown')
+                    }
+            return result_map
+            
         except Exception as e:
-            print(f"Relevance check failed: {e}")
-            # Default to True to match 'inclusive' policy if AI fails, but maybe False to avoid spam? 
-            # Let's say True but log reason.
-            return True, f"AI Check Failed: {e}"
+            print(f"Batch relevance check failed: {e}")
+            # Fallback: Mark all as Relevant with error note (to be safe)
+            fallback_map = {}
+            for art in articles:
+                fallback_map[art.get('url_hash')] = {
+                    'is_relevant': True,
+                    'reason': f"Batch AI Check Failed: {e}"
+                }
+            return fallback_map
 
     def analyze_daily_market(self, context_news_list, market_data_str, economic_events_str, region):
         """
