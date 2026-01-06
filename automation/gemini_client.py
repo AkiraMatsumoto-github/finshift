@@ -937,8 +937,10 @@ class GeminiClient:
         2. **Sentiment Score**: 0 (Extreme Fear) to 100 (Extreme Greed). Estimate based on news tone and VIX/Market moves.
         3. **Primary Driver**: What single factor is driving prices today? (e.g. "Fed Pivot Hope", "China Slowdown").
         4. **Scenarios**:
-           - **Bull Case**: Specific condition for upside. Write in **Japanese** (detail Condition -> detail Result & specific value format), around 100 chars.
-           - **Bear Case**: Specific condition for downside. Write in **Japanese** (detail Condition -> detail Result & specific value format), around 100 chars.
+           - **Bull Case**: Specific condition for upside. Write in **Japanese**. MUST include the RESULT/TARGET PRICE. format: "Condition -> Result".
+             Example: "ISM製造業景況指数が50を上回った場合、ドル円は152円台を回復し、日経平均は39000円を目指す展開。"
+           - **Bear Case**: Specific condition for downside. Write in **Japanese**. MUST include the RESULT/TARGET PRICE. format: "Condition -> Result".
+             Example: "雇用統計が予想を下回った場合、景気後退懸念からドル売りが加速し、145円台まで急落するリスク。"
         
         5. **AI Structured Summary**:
            - **summary**: A concise summary of the market driver and impact (max 200 chars). Used for dashboard cards. e.g. "米雇用統計が予想を上回り、FRBの利下げ観測が後退。これを受け米金利は急騰し..."
