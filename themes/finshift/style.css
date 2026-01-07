@@ -1324,7 +1324,7 @@ section {
     background: transparent;
     /* Remove wrapper background */
     padding: 0;
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
 }
 
 .market-hero-chart {
@@ -2470,7 +2470,7 @@ section {
 
 /* Dashboard / Market Pulse Styles */
 .market-pulse-section {
-    padding: var(--spacing-section) 0;
+    padding: var(--spacing-md) 0;
     background-color: var(--color-bg-primary);
 }
 

@@ -266,7 +266,7 @@ if ( ! $region_tag_slug ) {
                     // Fetch Featured News
                     $news_args = array(
                         'category_name' => 'featured-news',
-                        'tag'           => $region_tag_slug,
+                        'tag_slug__in'  => $query_tags,
                         'posts_per_page' => 5,
                         'orderby'       => 'date',
                         'order'         => 'DESC',
