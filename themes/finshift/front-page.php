@@ -318,6 +318,14 @@ get_header();
 								'posts_per_page' => 3,
 								'orderby'        => 'date',
 								'order'          => 'DESC',
+                                'tax_query'      => array(
+                                    array(
+                                        'taxonomy' => 'category',
+                                        'field'    => 'slug',
+                                        'terms'    => 'market-analysis',
+                                        'operator' => 'NOT IN',
+                                    ),
+                                ),
 							);
 							$ind_query = new WP_Query( $ind_args );
 
