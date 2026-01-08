@@ -1,7 +1,7 @@
 import os
 import json
 import requests
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from dotenv import load_dotenv
 
 # Load env from parent directory
@@ -97,13 +97,16 @@ class DBClient:
         else:
             print(f"Failed to save article: {article.get('title', '')[:30]}...")
 
-    def save_economic_event(self, event_date, event_name, country, impact, description, source):
+    def save_economic_event(self, event_date, event_name, country, impact, description, source, actual=None, forecast=None, previous=None):
         data = {
             "event_date": event_date,
             "event_name": event_name,
             "country": country,
             "impact": impact,
             "description": description,
+            "actual": actual,
+            "forecast": forecast,
+            "previous": previous,
             "source": source
         }
         self._post("economic-events", data)
@@ -159,6 +162,27 @@ class DBClient:
         # API supports start_date (default today) and days
         res = self._get("economic-events", {"days": days})
         return res if res else []
+
+    def get_recent_events(self, days=2):
+        # Fetch events for the past X days (including today)
+        start_date = (date.today() - timedelta(days=days)).isoformat()
+        res = self._get("economic-events", {"start_date": start_date, "days": days + 1}) # +1 to include today
+        return res if res else []
+        
+    def get_latest_analysis_by_region(self, region):
+        # Use the newly added GET daily-analysis endpoint
+        # The endpoint returns a single object if limit=1
+        try:
+            res = self._get("daily-analysis", {"region": region, "limit": 1})
+            if res:
+                return res
+        except requests.exceptions.RequestException as e:
+            # 404 means endpoint might be missing or no data if designed that way (though usually returns empty list)
+            # If endpoint missing, we just skip context.
+            print(f"Warning: Could not fetch previous analysis: {e}")
+            return None
+        return None
+
 
     def save_daily_analysis(self, analysis_record):
         # API expects: date, region, sentiment_score, ...

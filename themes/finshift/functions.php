@@ -449,6 +449,9 @@ function finshift_initialize_tables() {
         event_name varchar(255) NOT NULL,
         impact varchar(20) DEFAULT 'Medium',
         description text DEFAULT NULL,
+        actual varchar(50) DEFAULT NULL,
+        forecast varchar(50) DEFAULT NULL,
+        previous varchar(50) DEFAULT NULL,
         source varchar(50) DEFAULT 'system',
         created_at datetime DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY  (id),
@@ -513,8 +516,21 @@ function finshift_register_api_routes() {
 
     // Daily Analysis
     register_rest_route( $namespace, '/daily-analysis', array(
-        'methods' => 'POST',
-        'callback' => 'finshift_api_save_daily_analysis',
+        array(
+            'methods' => 'POST',
+            'callback' => 'finshift_api_save_daily_analysis',
+            'permission_callback' => 'finshift_api_auth_check',
+        ),
+        array(
+            'methods' => 'GET',
+            'callback' => 'finshift_api_get_daily_analysis',
+            'permission_callback' => '__return_true',
+        )
+    ) );
+
+    register_rest_route( $namespace, '/update-schema', array(
+        'methods' => 'GET',
+        'callback' => 'finshift_api_update_schema',
         'permission_callback' => 'finshift_api_auth_check',
     ) );
 
@@ -638,6 +654,12 @@ function finshift_api_save_market_snapshot( $request ) {
     return array( 'success' => true, 'id' => $wpdb->insert_id );
 }
 
+function finshift_api_update_schema() {
+    finshift_initialize_tables();
+    flush_rewrite_rules();
+    return array( 'success' => true, 'message' => 'Schema updated & Rules flushed' );
+}
+
 function finshift_api_get_market_snapshot( $request ) {
     global $wpdb;
     $table = $wpdb->prefix . FINSHIFT_TBL_MARKET_SNAPSHOTS;
@@ -673,6 +695,32 @@ function finshift_api_save_daily_analysis( $request ) {
     return array( 'success' => true );
 }
 
+function finshift_api_get_daily_analysis( $request ) {
+    global $wpdb;
+    $table = $wpdb->prefix . FINSHIFT_TBL_DAILY_ANALYSIS;
+    $region = $request->get_param('region');
+    $limit = $request->get_param('limit') ? intval($request->get_param('limit')) : 1;
+    
+    $query = "SELECT * FROM $table";
+    if ( $region ) {
+        $query .= $wpdb->prepare( " WHERE region = %s", $region );
+    }
+    $query .= " ORDER BY date DESC LIMIT %d";
+    
+    $results = $wpdb->get_results( $wpdb->prepare( $query, $limit ) );
+    
+    foreach ($results as $row) {
+        $row->scenarios = json_decode( $row->scenarios_json );
+        unset($row->scenarios_json); 
+    }
+    
+    // If limit is 1, return single object or null
+    if ($limit === 1) {
+        return !empty($results) ? $results[0] : null;
+    }
+    return $results;
+}
+
 function finshift_api_save_economic_event( $request ) {
     global $wpdb;
     $table = $wpdb->prefix . FINSHIFT_TBL_ECONOMIC_EVENTS;
@@ -687,9 +735,12 @@ function finshift_api_save_economic_event( $request ) {
             'event_name' => $params['event_name'],
             'impact' => $params['impact'],
             'description' => $params['description'],
+            'actual' => isset($params['actual']) ? $params['actual'] : null,
+            'forecast' => isset($params['forecast']) ? $params['forecast'] : null,
+            'previous' => isset($params['previous']) ? $params['previous'] : null,
             'source' => $params['source']
         ),
-        array( '%s', '%s', '%s', '%s', '%s', '%s' ) 
+        array( '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) 
     );
     
     if ( $result === false ) return new WP_Error( 'db_error', $wpdb->last_error, array( 'status' => 500 ) );

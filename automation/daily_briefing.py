@@ -21,7 +21,7 @@ from automation.gemini_client import GeminiClient
 from automation.wp_client import WordPressClient
 from automation.collectors.collector import collect_articles
 from automation.collectors import market_data
-from automation.collectors import economic_calendar
+from automation.collectors import forex_factory
 
 def get_url_hash(url):
     return hashlib.sha256(url.encode('utf-8')).hexdigest()
@@ -154,13 +154,11 @@ def phase_1_collection(args):
     print("Market snapshot saved.")
 
     # 3. Economic Calendar
-    if args.region == "all" or args.region == "Global":
-        print(">> Collecting Economic Calendar...")
-        # Note: economic_calendar script writes directly. We can't easily suppress it for dry-run 
-        # unless we modify it. For now, we just run it if not dry-run.
-        if not args.dry_run:
-            economic_calendar.fetch_and_save_calendar(days=14)
-        print("Economic calendar updated.")
+    # Always collect economic events as they impact all regions
+    print(">> Collecting Economic Calendar...")
+    if not args.dry_run:
+        forex_factory.fetch_and_save_calendar(days=14)
+    print("Economic calendar updated.")
 
 def phase_2_analysis(args):
     print("\n=== Phase 2: Analysis & Generation ===")
@@ -182,24 +180,58 @@ def phase_2_analysis(args):
         # 1. Get Context
         news = db.get_articles(region=region, hours=args.hours)
         market_snap = db.get_latest_market_snapshot()
-        events = db.get_upcoming_events(days=7)
         
-        print(f"Context: {len(news)} articles, Market Data: {'Yes' if market_snap else 'No'}, Events: {len(events)}")
+        # Get Upcoming Events (Future 7 days)
+        upcoming_events = db.get_upcoming_events(days=7)
+        # Get Recent Events (Past 24-48h) for Context
+        recent_events = db.get_recent_events(days=2) # Needed for "Review"
+        
+        # Get Previous Analysis for Continuity
+        prev_analysis = db.get_latest_analysis_by_region(region)
+        
+        print(f"Context: {len(news)} articles, Market Data: {'Yes' if market_snap else 'No'}, "
+              f"Events: {len(upcoming_events)} (Upcoming) / {len(recent_events)} (Recent)")
         
         if not news and not market_snap:
             print("Skipping due to lack of data.")
             continue
             
-        if args.dry_run:
-            print("[Dry-Run] Skipping AI Analysis & Writing.")
-            continue
-
         # 2. Analyze
         print("Analyzing Market...")
         market_data_str = json.dumps(market_snap['data_json']) if market_snap and 'data_json' in market_snap else "No Data"
-        events_str = "\n".join([f"{e['event_date']}: {e['event_name']} ({e['impact']})" for e in events])
         
-        analysis = gemini.analyze_daily_market(news, market_data_str, events_str, region)
+        # Format Events Strings
+        events_str = "## Upcoming Economic Calendar (Next 7 Days)\n"
+        events_str += "\n".join([f"- {e['event_date']}: {e['event_name']} ({e['impact']})" for e in upcoming_events])
+        
+        recent_events_str = "## Recent Economic Results (Past 48 Hours)\n"
+        recent_events_str += "\n".join([
+            f"- {e['event_date']} {e['event_name']}: Act {e.get('actual','?')} vs fcst {e.get('forecast','?')}" 
+            for e in recent_events
+        ])
+
+        # Format Previous Analysis Context
+        prev_context_str = ""
+        if prev_analysis:
+            prev_context_str = f"""
+            ## Yesterday's Analysis Context
+            - Market Regime: {prev_analysis.get('market_regime')}
+            - Bull Scenario: {prev_analysis.get('scenarios', {}).get('bull', {}).get('condition')}
+            - Bear Scenario: {prev_analysis.get('scenarios', {}).get('bear', {}).get('condition')}
+            """
+        
+        if args.dry_run:
+            print(" [Dry-Run] Generating Analysis with Context...")
+            print(f"   - Recent Events: {len(recent_events)} items")
+            print(f"   - Prev Analysis: {'Available' if prev_analysis else 'None (404 expected if not deployed)'}")
+
+        analysis = gemini.analyze_daily_market(
+            news, 
+            market_data_str, 
+            events_str, 
+            region, 
+            extra_context=recent_events_str + "\n" + prev_context_str
+        )
         
         if not analysis:
             print("Analysis failed.")
@@ -217,6 +249,14 @@ def phase_2_analysis(args):
             events_str=events_str,
             date_str=today_str
         )
+        
+        if args.dry_run:
+            print("\n[Dry-Run] Generated Briefing (Excerpt):")
+            print("-" * 40)
+            print(article_md[:500] + "...\n(truncated)")
+            print("-" * 40)
+            print("[Dry-Run] Skipping DB Save, File Save, and WordPress Post.")
+            continue
         
         if not article_md:
             print("Writing failed.")

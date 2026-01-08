@@ -911,7 +911,7 @@ class GeminiClient:
                 }
             return fallback_map
 
-    def analyze_daily_market(self, context_news_list, market_data_str, economic_events_str, region):
+    def analyze_daily_market(self, context_news_list, market_data_str, economic_events_str, region, extra_context=""):
         """
         Analyze multiple news and market data to generate market insights.
         Returns: JSON with sentiment, regime, drivers, scenarios.
@@ -932,19 +932,21 @@ class GeminiClient:
         ### 3. Key News (Last 24h)
         {news_text}
         
+        ### 4. Context & Continuity (Important)
+        {extra_context}
+        
         ## Analysis Tasks
-        1. **Market Regime**: Define the current mood in **Japanese** (e.g., "リスクオン", "リスクオフ", "適温相場", "スタグフレーション懸念", "様子見", "調整局面").
-        2. **Sentiment Score**: 0 (Extreme Fear) to 100 (Extreme Greed). Estimate based on news tone and VIX/Market moves.
-        3. **Primary Driver**: What single factor is driving prices today? (e.g. "Fed Pivot Hope", "China Slowdown").
+        1. **Market Regime**: Define the current mood in **Japanese**.
+        2. **Sentiment Score**: 0 (Extreme Fear) to 100 (Extreme Greed).
+        3. **Primary Driver**: What single factor is driving prices today?
+           - **Consistency Check**: Reference the "Context & Continuity" section. Did yesterday's Bull/Bear scenario play out? Did recent economic results match forecasts? Explicitly mention this in your reasoning/driver logic if relevant.
         4. **Scenarios**:
            - **Bull Case**: Specific condition for upside. Write in **Japanese**. MUST include the RESULT/TARGET PRICE. format: "Condition -> Result".
-             Example: "ISM製造業景況指数が50を上回った場合、ドル円は152円台を回復し、日経平均は39000円を目指す展開。"
            - **Bear Case**: Specific condition for downside. Write in **Japanese**. MUST include the RESULT/TARGET PRICE. format: "Condition -> Result".
-             Example: "雇用統計が予想を下回った場合、景気後退懸念からドル売りが加速し、145円台まで急落するリスク。"
         
         5. **AI Structured Summary**:
-           - **summary**: A concise summary of the market driver and impact (max 200 chars). Used for dashboard cards. e.g. "米雇用統計が予想を上回り、FRBの利下げ観測が後退。これを受け米金利は急騰し..."
-           - **key_topics**: List of 3-5 key entities or topics (e.g. ["NVIDIA", "CPI", "USD/JPY"]). Used for internal linking.
+           - **summary**: A concise summary (max 200 chars).
+           - **key_topics**: List of 3-5 key entities.
 
         ## Output JSON
         {{
