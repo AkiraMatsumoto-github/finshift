@@ -87,52 +87,51 @@ keyword: {keyword}
     except Exception as e:
         print(f"Warning: Failed to save local file: {e}")
 
-def main():
-    parser = argparse.ArgumentParser(description="Generate and post an article to WordPress.")
-    parser.add_argument('--keyword', type=str, required=True, help='Keyword for the article')
-    parser.add_argument('--type', type=str, default='market-analysis', choices=['market-analysis', 'featured-news', 'strategic-assets', 'investment-guide', 'news', 'global'], help='Article type')
-    parser.add_argument('--dry-run', action='store_true', help='Generate content but do not post to WordPress')
-    parser.add_argument('--schedule', type=str, help='Schedule date (YYYY-MM-DD HH:MM or YYYY-MM-DD HH:MM:SS)')
-    parser.add_argument('--context', type=str, help='Article context for News/Global articles (JSON string, optional)')
-    parser.add_argument('--category', type=str, help='Article category slug (e.g., market-analysis, featured-news)')
-    
-    args = parser.parse_args()
+def run_generation_task(args, gemini_client=None, wp_client=None):
+    """
+    Main workflow for generating a single article.
+    Can be called from other scripts (pipeline.py) or main().
+    """
+    print(f"Starting article generation for keyword: {args.keyword} (Type: {args.type})")
     
     # Define output directory
     import os
     OUTPUT_DIR = os.path.join(os.path.dirname(__file__), "generated_articles")
     if not os.path.exists(OUTPUT_DIR):
         os.makedirs(OUTPUT_DIR)
-    
-    print(f"Starting article generation for keyword: {args.keyword} (Type: {args.type})")
-    
+        
     # 1. Initialize Clients
-    wp_client = None
-    try:
-        gemini = GeminiClient()
+    gemini = gemini_client
+    wp = wp_client
+
+    if gemini is None:
+        try:
+            gemini = GeminiClient()
+        except Exception as e:
+             print(f"Failed to initialize Gemini Client: {e}")
+             return False
+
+    if wp is None:
         # Initialize WP client for reading (linking) even in dry-run
         try:
-            from wp_client import WordPressClient # Ensure class is available if not imported top-level
+            from automation.wp_client import WordPressClient
         except ImportError:
-            pass # Already imported
-            
+            try:
+                from wp_client import WordPressClient
+            except ImportError:
+                pass
+        
         try:
             wp_client = WordPressClient()
+            wp = wp_client
             print("WordPress Client initialized (for reading/linking).")
         except Exception as e:
             print(f"Warning: WordPress Client initialization failed: {e}. Internal linking will be skipped.")
-            
-        if not args.dry_run and wp_client is None:
-             print("Error: WordPress credentials required for non-dry-run mode.")
-             sys.exit(1)
-            
-        # Assign to 'wp' for compatibility (though we use wp_client now)
-        wp = wp_client
-             
-    except Exception as e:
-        print(f"Failed to initialize Gemini Client: {e}")
-        sys.exit(1)
-        
+
+    if not args.dry_run and wp is None:
+            print("Error: WordPress credentials required for non-dry-run mode.")
+            return False
+
     # Parse context if provided
     context = None
     if args.context:
@@ -148,10 +147,10 @@ def main():
     
     # 1.5 Internal Linking Suggestions
     extra_instructions = None
-    if wp_client:
+    if wp:
         try:
             print("--- Internal Link Suggester ---")
-            linker = InternalLinkSuggester(wp_client, gemini)
+            linker = InternalLinkSuggester(wp, gemini) # Pass existing clients
             # Limit to 50 for performance during generation
             candidates = linker.fetch_candidates(limit=50) 
             
@@ -224,7 +223,7 @@ Select the most relevant ones (if any) and include them in the article using sta
     
     if not generated_text:
         print("Failed to generate content.")
-        sys.exit(1)
+        return False
         
     title, content = parse_article_content(generated_text)
     
@@ -242,7 +241,11 @@ Select the most relevant ones (if any) and include them in the article using sta
         except ImportError:
             from automation.seo_optimizer import SEOOptimizer
             
-        optimizer = SEOOptimizer()
+        optimizer = SEOOptimizer(client=gemini) # Pass GEMINI client! Need to update SEOOptimizer too? Assuming it uses it or standalone. 
+        # Checking SEOOptimizer... It probably inits Gemini. We should update it if we want full DI but let's stick to core loop first.
+        # Actually SEOOptimizer usually calls Gemini. If so, we should pass used client.
+        # For now, let's assume it works or has low overhead. 
+        # optimization: If SEOOptimizer allows client injection, use it.
         
         # Generate Meta Description
         meta_desc = optimizer.generate_meta_description(title, content, args.keyword)
@@ -265,12 +268,10 @@ Select the most relevant ones (if any) and include them in the article using sta
     image_prompt = gemini.generate_image_prompt(title, content_summary, args.type)
     print(f"Image prompt: {image_prompt}")
     
-    import os
-    output_dir = os.path.join(os.path.dirname(__file__), "generated_articles")
     date_str = datetime.now().strftime("%Y-%m-%d")
     safe_keyword = re.sub(r'[\\/*?:"\<\>| ]', '_', args.keyword)
     image_filename = f"{date_str}_{safe_keyword}_hero.png"
-    image_path = os.path.join(output_dir, image_filename)
+    image_path = os.path.join(OUTPUT_DIR, image_filename)
     
     generated_image_path = gemini.generate_image(image_prompt, image_path, aspect_ratio="16:9")
     
@@ -285,7 +286,8 @@ Select the most relevant ones (if any) and include them in the article using sta
     tag_ids = []
     
     try:
-        classifier = ArticleClassifier()
+        # Inject client into Classifier
+        classifier = ArticleClassifier(client=gemini)
         classification = classifier.classify_article(title, content[:1000])
         
         # Override category if provided via arguments (Source of Truth)
@@ -294,15 +296,6 @@ Select the most relevant ones (if any) and include them in the article using sta
             classification["category"] = args.category
             
         print(f"Classification Result: {classification}")
-        
-        # Resolve IDs if not dry-run (or even in dry-run if we want to test lookup, but let's skip for speed)
-        # Actually, let's resolve them to verify logic if we have a client.
-        # But we initialize wp_client later. Let's initialize it earlier if needed.
-        # Or just do it in the posting block.
-        # Let's do it here if we want to print them in dry run?
-        # No, let's keep it simple. Just pass the classification dict to the posting block?
-        # No, create_post expects IDs.
-        # Let's initialize WP client here if we are going to post.
         
     except Exception as e:
         print(f"Classification failed: {e}")
@@ -331,12 +324,12 @@ Select the most relevant ones (if any) and include them in the article using sta
         print(f"Title: {optimized_title}")
         print(f"Meta Description: {meta_desc}")
         print(content[:500] + "...")
-        return
+        return True
 
     # 5. Post to WordPress
     print("Posting to WordPress...")
     try:
-        wp = WordPressClient()
+        # Use existing WP client
         
         # Resolve Categories and Tags
         if classification:
@@ -410,7 +403,7 @@ Select the most relevant ones (if any) and include them in the article using sta
                 print(f"Scheduling post for: {schedule_date}")
             except ValueError as e:
                 print(f"Error: {e}")
-                sys.exit(1)
+                return False
         else:
             schedule_date = None
             status = "publish"
@@ -423,7 +416,6 @@ Select the most relevant ones (if any) and include them in the article using sta
 
         if 'structured_summary' in locals() and structured_summary:
             meta_fields["ai_structured_summary"] = json.dumps(structured_summary, ensure_ascii=False)
-            
             
             # Extract Scenarios
             if "bull_scenario" in structured_summary:
@@ -456,7 +448,7 @@ Select the most relevant ones (if any) and include them in the article using sta
                     except ImportError:
                         from sns_client import SNSClient
                     print("Initializing SNS Client...")
-                    sns = SNSClient()
+                    sns = SNSClient() # TODO: Pass Gemini Client to SNS Client if supported?
                     
                     if sns.x_client:
                         print("Generating SNS content...")
@@ -487,15 +479,27 @@ Select the most relevant ones (if any) and include them in the article using sta
                 except Exception as e:
                     print(f"SNS Posting failed: {e}")
             # -------------------------------
+            return True
         else:
             print("Failed to create post.")
+            return False
 
     except Exception as e:
         print(f"Failed to post to WordPress: {e}")
+        return False
 
-
-
-
+def main():
+    parser = argparse.ArgumentParser(description="Generate and post an article to WordPress.")
+    parser.add_argument('--keyword', type=str, required=True, help='Keyword for the article')
+    parser.add_argument('--type', type=str, default='market-analysis', choices=['market-analysis', 'featured-news', 'strategic-assets', 'investment-guide', 'news', 'global'], help='Article type')
+    parser.add_argument('--dry-run', action='store_true', help='Generate content but do not post to WordPress')
+    parser.add_argument('--schedule', type=str, help='Schedule date (YYYY-MM-DD HH:MM or YYYY-MM-DD HH:MM:SS)')
+    parser.add_argument('--context', type=str, help='Article context for News/Global articles (JSON string, optional)')
+    parser.add_argument('--category', type=str, help='Article category slug (e.g., market-analysis, featured-news)')
+    
+    args = parser.parse_args()
+    
+    run_generation_task(args)
 
 if __name__ == "__main__":
     main()

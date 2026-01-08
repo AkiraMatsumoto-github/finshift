@@ -75,14 +75,17 @@ BATCH_SCORING_PROMPT = SHARED_CRITERIA + """
 """
 
 class ArticleScorer:
-    def __init__(self):
-        try:
-            self.client = GeminiClient()
-        except Exception as e:
-            print(f"Error initializing GeminiClient: {e}", file=sys.stderr)
-            self.client = None
+    def __init__(self, client=None):
+        if client:
+             self.client = client
+        else:
+            try:
+                self.client = GeminiClient()
+            except Exception as e:
+                print(f"Error initializing GeminiClient: {e}", file=sys.stderr)
+                self.client = None
 
-    def score_article(self, article, model_name="gemini-3-pro-preview"):
+    def score_article(self, article, model_name="gemini-3-flash-preview"):
         """Score a single article."""
         if not self.client:
             return {**article, "score": 0, "reasoning": "Client Init Failed"}
@@ -110,7 +113,7 @@ class ArticleScorer:
             print(f"Scoring error {article.get('title')}: {e}")
             return {**article, "score": 0, "reasoning": f"Error: {e}"}
 
-    def score_articles_batch(self, articles, model_name="gemini-3-pro-preview", start_id=0):
+    def score_articles_batch(self, articles, model_name="gemini-3-flash-preview", start_id=0):
         """Score a batch of articles."""
         if not articles or not self.client:
             return []
@@ -155,13 +158,11 @@ class ArticleScorer:
 
 # Legacy function aliases for compatibility if needed
 def score_article(article, client=None):
-    scorer = ArticleScorer()
-    if client: scorer.client = client
+    scorer = ArticleScorer(client=client)
     return scorer.score_article(article)
 
 def score_articles_batch(articles, client=None, start_id=0):
-    scorer = ArticleScorer()
-    if client: scorer.client = client
+    scorer = ArticleScorer(client=client)
     return scorer.score_articles_batch(articles, start_id=start_id)
 
 if __name__ == "__main__":

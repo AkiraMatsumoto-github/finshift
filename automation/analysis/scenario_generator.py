@@ -83,7 +83,7 @@ class ScenarioGenerator:
             # Use the retry logic from GeminiClient, accessing the raw client model
             response = self.client._retry_request(
                 self.client.client.models.generate_content,
-                model='gemini-3-pro-preview',
+                model='gemini-3-flash-preview',
                 contents=prompt,
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json"

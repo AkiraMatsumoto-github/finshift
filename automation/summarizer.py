@@ -43,7 +43,7 @@ SUMMARIZATION_PROMPT = """あなたは金融メディア「FinShift」のシニ�
 """
 
 
-def summarize_article(content: str, title: str, model_name: str = "gemini-3-pro-preview") -> dict:
+def summarize_article(content: str, title: str, model_name: str = "gemini-3-flash-preview", client=None) -> dict:
     """
     Summarize article content and extract key facts for Context.
     
@@ -51,22 +51,23 @@ def summarize_article(content: str, title: str, model_name: str = "gemini-3-pro-
         content: Article content
         title: Article title
         model_name: Gemini model to use
+        client: GeminiClient instance (optional)
     
     Returns:
         Dictionary with keys: summary, key_facts, finshift_view
     """
     print(f"Summarizing article: {title[:50]}...")
     
-    
-    try:
-        client = GeminiClient()
-    except Exception as e:
-        print(f"Error initializing GeminiClient: {e}")
-        return {
-            "summary": f"要約生成に失敗しました: {str(e)}",
-            "key_facts": [],
-            "finshift_view": "分析できませんでした。"
-        }
+    if client is None:
+        try:
+            client = GeminiClient()
+        except Exception as e:
+            print(f"Error initializing GeminiClient: {e}")
+            return {
+                "summary": f"要約生成に失敗しました: {str(e)}",
+                "key_facts": [],
+                "finshift_view": "分析できませんでした。"
+            }
     
     prompt = SUMMARIZATION_PROMPT.format(
         title=title,

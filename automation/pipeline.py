@@ -167,6 +167,7 @@ def main():
     print(f"\nFound {len(high_score_articles)} articles above threshold {args.threshold}.")
     
     # 3. Generation
+    # 3. Generation
     print("\n=== Step 3: Generation ===")
     
     if not high_score_articles:
@@ -175,27 +176,39 @@ def main():
 
     count = 0
     
-    # Schedule logic removed - defaulting to immediate publish
-    
     # Initialize Classifier & Clients
     print("Initializing clients for generation...")
-    classifier = ArticleClassifier()
     # gemini_client is already initialized
-    wp_client = WordPressClient()
+    classifier = ArticleClassifier(client=gemini_client)
+    
+    # Initialize WP Client
+    wp_client = None
+    try:
+        wp_client = WordPressClient()
+    except Exception as e:
+         print(f"Warning: Failed to initialize WP Client: {e}")
 
+    # Imports for generation (moved from top level to avoid circular imports if any, though generated_article imports pipeline? No.)
+    # Actually, import at top level is fine in Python usually unless circular.
+    # But let's import here or at top.
+    from automation.generate_article import run_generation_task
+    
     # Fetch existing posts for deduplication
     print("Fetching recent posts for deduplication check...")
     existing_titles = []
-    try:
-        # Fetch more posts to be safe, e.g., last 30
-        recent_posts = wp_client.get_posts(limit=30, status="publish")
-        if recent_posts:
-            existing_titles = [p['title']['rendered'] for p in recent_posts]
-            print(f"Loaded {len(existing_titles)} existing post titles.")
-        else:
-            print("No existing posts found or failed to fetch.")
-    except Exception as e:
-        print(f"Warning: Failed to fetch existing posts: {e}")
+    if wp_client:
+        try:
+            # Fetch more posts to be safe, e.g., last 30
+            recent_posts = wp_client.get_posts(limit=30, status="publish")
+            if recent_posts:
+                existing_titles = [p['title']['rendered'] for p in recent_posts]
+                print(f"Loaded {len(existing_titles)} existing post titles.")
+            else:
+                print("No existing posts found or failed to fetch.")
+        except Exception as e:
+            print(f"Warning: Failed to fetch existing posts: {e}")
+    else:
+        print("Skipping deduplication check (WP Client not available).")
 
     generated_titles_this_run = []
 
@@ -223,42 +236,37 @@ def main():
         # ---------------------------
         
         # Determine Category & Type
-        # Exclude 'market-analysis' from pipeline generation as it's reserved for daily briefing
         classification = classifier.classify_article(article['title'], article['summary'], excluded_categories=['market-analysis'])
-        category_slug = classification.get('category', 'featured-news') # Fallback changed
-        
-        # Map Category to Type
-        # Direct mapping for FinShift
+        category_slug = classification.get('category', 'featured-news')
         article_type = category_slug
             
         print(f"Category: {category_slug} -> Type: {article_type}")
         
-        # Generate keyword
-        keyword = article['title']
+        # Prepare arguments for task
+        # We need a namespace or mock object appropriately since run_generation_task expects argparse.Namespace
+        class TaskArgs:
+            def __init__(self, **kwargs):
+                self.__dict__.update(kwargs)
+                
+        task_args_dict = {
+            "keyword": article['title'],
+            "type": article_type,
+            "category": category_slug,
+            "dry_run": args.dry_run,
+            "schedule": None, # Default immediate
+            "context": None
+        }
         
-        # Base command
-        cmd = [
-            sys.executable, os.path.join(base_dir, "generate_article.py"),
-            "--keyword", keyword,
-            "--type", article_type,
-            "--category", category_slug
-        ]
-        
-        # News/Global articles: Context-based generation (URL reading + summarization)
-        # All FinShift news-based types should use context
+        # Context Generation
         if article_type in ["news", "global", "market-analysis", "featured-news", "strategic-assets"]:
             print("\n--- Context-based generation (URL reading + summarization) ---")
             
             try:
-                # Step 2.5-A: URL reading and summarization
                 article_content = extract_content(article['url'], article['source'])
                 
                 if article_content['content'] and "Error" not in article_content['title']:
-                    summary_data = summarize_article(article_content['content'], article['title'])
-                    
-                    # Pass context as JSON string
-                    context_json = json.dumps(summary_data, ensure_ascii=False)
-                    cmd.extend(["--context", context_json])
+                    summary_data = summarize_article(article_content['content'], article['title'], client=gemini_client)
+                    task_args_dict["context"] = json.dumps(summary_data, ensure_ascii=False)
                     print(f"Context created: {len(summary_data['summary'])} chars summary, {len(summary_data['key_facts'])} key facts")
                 else:
                     print("Warning: Failed to extract content, falling back to keyword-based generation")
@@ -266,17 +274,18 @@ def main():
                 print(f"Error during context creation: {e}")
                 print("Falling back to keyword-based generation")
         else:
-            print("\n--- Keyword-based generation (traditional) ---")
-            # Know/Buy/Do articles: No context (maintain current behavior)
+             print("\n--- Keyword-based generation (traditional) ---")
+             
+        # Execute Generation Task
+        task_args = TaskArgs(**task_args_dict)
         
-        if args.dry_run:
-            cmd.append("--dry-run")
-        
-        # print(f"Scheduled for: {schedule_datetime}")
+        try:
+             success = run_generation_task(task_args, gemini_client=gemini_client, wp_client=wp_client)
+             if success:
+                 count += 1
+        except Exception as e:
+             print(f"Error executing generation task: {e}")
 
-            
-        subprocess.run(cmd)
-        count += 1
         print("-" * 40)
 
 if __name__ == "__main__":
