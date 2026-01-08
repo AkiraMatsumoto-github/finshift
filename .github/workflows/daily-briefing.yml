@@ -76,6 +76,18 @@ jobs:
           cd automation
           python -u daily_briefing.py --region Crypto --phase analyze
 
+      # 4. China Briefing
+      - name: Generate Briefing (CN)
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          WP_URL: ${{ secrets.WP_URL }}
+          WP_USER: ${{ secrets.WP_USER }}
+          WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+          GOOGLE_CLOUD_LOCATION: "global"
+        run: |
+          cd automation
+          python -u daily_briefing.py --region CN --phase analyze
+
       - name: Upload artifacts
         if: success() || failure() # Upload what we have even if one step fails
         uses: actions/upload-artifact@v4
