@@ -71,25 +71,20 @@ class SEOOptimizer:
         """Generate a simple fallback meta description."""
         return f"{keyword}について解説。{title}をわかりやすく説明します。金融市場・投資戦略の最新情報をお届けします。"[:160]
     
-    def create_json_ld(self, article_data):
+    def create_json_ld(self, article_data, schema_type="Article"):
         """
         Create JSON-LD structured data for the article.
         
         Args:
-            article_data: Dict containing:
-                - title: Article title
-                - content: Article content (text)
-                - url: Article URL
-                - date_published: ISO 8601 date string
-                - date_modified: ISO 8601 date string (optional)
-                - image_url: Featured image URL (optional)
-                
+            article_data: Dict containing article details
+            schema_type: "Article" or "NewsArticle" (default: "Article")
+            
         Returns:
             str: JSON-LD as string
         """
         schema = {
             "@context": "https://schema.org",
-            "@type": "Article",
+            "@type": schema_type,
             "headline": article_data.get("title", ""),
             "author": {
                 "@type": "Organization",
@@ -106,6 +101,7 @@ class SEOOptimizer:
             "datePublished": article_data.get("date_published", datetime.now().isoformat()),
             "dateModified": article_data.get("date_modified", article_data.get("date_published", datetime.now().isoformat())),
         }
+
         
         # Add URL if provided
         if article_data.get("url"):

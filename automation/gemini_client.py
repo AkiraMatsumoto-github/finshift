@@ -940,9 +940,11 @@ class GeminiClient:
         2. **Sentiment Score**: 0 (Extreme Fear) to 100 (Extreme Greed).
         3. **Primary Driver**: What single factor is driving prices today?
            - **Consistency Check**: Reference the "Context & Continuity" section. Did yesterday's Bull/Bear scenario play out? Did recent economic results match forecasts? Explicitly mention this in your reasoning/driver logic if relevant.
-        4. **Reflect on Previous Scenarios**: Reference the "Context & Continuity" section. Did yesterday's Bull/Bear scenario play out?
-           - If yes, why?
-           - If no, what unexpected factor intervened?
+         4. **Reflect on Previous Scenarios**: Reference the "Context & Continuity" section. Did yesterday's **Main/Bull/Bear** scenario play out?
+            - **CRITICAL**: You MUST accurately compare the "Yesterday's Analysis Context" with today's "Key News" and "Raw Data".
+            - If yes, specifically mention which scenario (Main/Bull/Bear) was hit.
+            - If no (surprise), what unexpected factor intervened?
+
         5. **Scenarios**:
            - **Main Scenario (Base Case)**: The most likely outcome. Write in **Japanese**. **Format**: "Condition -> Result (Specific Marker Change)". Example: "US CPI matches expectation -> S&P500 maintains 6000 level / USDJPY stays at 155".
            - **Bull Case**: Condition for upside. Write in **Japanese**. **Format**: "Condition -> Result (Specific Marker Change)". Example: "Job data cools -> Yields drop to 4.2%, S&P500 rises to 6050".
@@ -1048,7 +1050,10 @@ class GeminiClient:
            - Analyze the primary driver. Connect it to asset moves.
            - *Must* cite specific news or data points from Input.
            - Explain the mechanism.
-           - **Scenario Continuity**: Briefly mention if yesterday's scenario played out (Reference `scenarios.review` from Input 1).
+            - **Scenario Continuity (CRITICAL)**: You MUST include a distinct paragraph reviewing yesterday's forecast.
+              - Use the content from `scenarios.review` (Input 1).
+              - Explicitly state: "Yesterday's Main Scenario (Condition: ...) was [Hit/Missed] because..."
+
         
         4. **【注目アセット】 (Asset Watch)**
            - Markdown table summarizing key asset moves.

@@ -2,6 +2,7 @@
 
 > [!IMPORTANT]
 > **CRITICAL INSTRUCTIONS (絶対遵守ルール)**
+0.このファイルを読み込んだら”GEMINI.mdを読み込みました”と宣言して
 > 1.  **All Outputs in Japanese**: 会話、思考プロセス、アーティファクト（計画書・タスクリスト）、コミットメッセージなど、全ての出力を**日本語**で行うこと。
 >     - **Task Artifact**: タスク管理には必ず `.agent/templates/task_ja.md` を使用する。
 > 2.  **Immediate Cleanup**: 検証用に作成したスクリプトや一時ファイルは、検証完了後・報告前に**必ず削除**する。リポジトリを汚さないこと。

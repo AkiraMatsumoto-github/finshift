@@ -193,6 +193,18 @@ class DBClient:
         # analysis_record matches.
         self._post("daily-analysis", analysis_record)
 
+    def update_daily_analysis_url(self, date_str, region, url):
+        """
+        Update the article_url for a specific analysis record.
+        """
+        payload = {
+            "date": date_str,
+            "region": region,
+            "article_url": url
+        }
+        self._post("daily-analysis", payload)
+
+
     def update_schema(self):
         """Trigger remote DB schema update/initialization."""
         self._get("update-schema")

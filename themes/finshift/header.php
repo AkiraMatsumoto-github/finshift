@@ -71,3 +71,9 @@
 			</nav><!-- #site-navigation -->
 		</div>
 	</header><!-- #masthead -->
+
+    <?php 
+    if ( function_exists( 'finshift_breadcrumb' ) ) {
+        finshift_breadcrumb(); 
+    }
+    ?>

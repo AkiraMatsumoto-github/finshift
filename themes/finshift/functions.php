@@ -207,7 +207,98 @@ function finshift_seo_meta() {
     <meta name="twitter:image" content="<?php echo esc_url( $image ); ?>">
     <?php
 }
-add_action( 'wp_head', 'finshift_seo_meta', 1 );
+    <?php
+}
+
+/**
+ * Conditionally load Theme SEO only if no SEO plugin is active.
+ * Prevents duplicate tags.
+ */
+function finshift_load_theme_seo() {
+    // Check for Yoast SEO or All in One SEO
+    $yoast_active = defined('WPSEO_VERSION');
+    $aioseo_active = defined('AIOSEO_VERSION');
+
+    if ( ! $yoast_active && ! $aioseo_active ) {
+        add_action( 'wp_head', 'finshift_seo_meta', 1 );
+    }
+}
+add_action( 'wp', 'finshift_load_theme_seo' );
+
+
+/**
+ * Output JSON-LD Structured Data
+ * Retrieves pre-generated JSON-LD from post meta or generates default.
+ */
+function finshift_output_json_ld() {
+    if ( is_singular( 'post' ) ) {
+        global $post;
+        $json_ld = get_post_meta( $post->ID, '_finshift_json_ld', true );
+        
+        if ( ! empty( $json_ld ) ) {
+            // Check if URL placeholder needs update (if Python side left it empty)
+            // Python side generated strictly static JSON. 
+            // Ideally we should inject the Current URL here if missing.
+            $data = json_decode( $json_ld, true );
+            if ( $data && ( empty( $data['url'] ) || empty( $data['mainEntityOfPage']['@id'] ) ) ) {
+                $permalink = get_permalink( $post->ID );
+                $data['url'] = $permalink;
+                $data['mainEntityOfPage'] = array(
+                    '@type' => 'WebPage',
+                    '@id'   => $permalink
+                );
+                $json_ld = json_encode( $data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE );
+            }
+            
+            echo '<script type="application/ld+json">' . "\n";
+            echo $json_ld . "\n";
+            echo '</script>' . "\n";
+        }
+    }
+}
+add_action( 'wp_head', 'finshift_output_json_ld', 5 );
+
+/**
+ * Breadcrumbs Function
+ */
+function finshift_breadcrumb() {
+    // Only show on front page or home if needed, usually we hide.
+    if ( is_front_page() || is_home() ) {
+        return;
+    }
+
+    echo '<nav class="breadcrumb" aria-label="Breadcrumb" style="font-size: 0.9rem; color: #888; margin-bottom: 20px;">';
+    echo '<a href="' . home_url() . '" style="color: #666; text-decoration: none;">Home</a>';
+    echo ' &gt; ';
+
+    if ( is_category() || is_single() ) {
+        $cats = get_the_category();
+        if ( $cats ) {
+            // Use the first category
+            $cat = $cats[0];
+            echo '<a href="' . get_category_link( $cat->term_id ) . '" style="color: #666; text-decoration: none;">' . $cat->name . '</a>';
+            if ( is_single() ) {
+                echo ' &gt; ';
+            }
+        }
+    }
+
+    if ( is_single() ) {
+        // Truncate title if too long
+        $title = get_the_title();
+        if ( mb_strlen( $title ) > 30 ) {
+            $title = mb_substr( $title, 0, 30 ) . '...';
+        }
+        echo '<span style="color: #999;">' . $title . '</span>';
+    } elseif ( is_page() ) {
+        echo '<span style="color: #999;">' . get_the_title() . '</span>';
+    } elseif ( is_search() ) {
+        echo '<span style="color: #999;">Search Results for "' . get_search_query() . '"</span>';
+    }
+
+    echo '</nav>';
+}
+
 
 /**
  * Disable canonical redirects only for category URLs.

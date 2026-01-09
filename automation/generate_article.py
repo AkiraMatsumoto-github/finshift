@@ -417,11 +417,65 @@ Select the most relevant ones (if any) and include them in the article using sta
         if 'structured_summary' in locals() and structured_summary:
             meta_fields["ai_structured_summary"] = json.dumps(structured_summary, ensure_ascii=False)
             
-            # Extract Scenarios
-            if "bull_scenario" in structured_summary:
-                meta_fields["_finshift_scenario_bull"] = structured_summary["bull_scenario"]
             if "bear_scenario" in structured_summary:
                 meta_fields["_finshift_scenario_bear"] = structured_summary["bear_scenario"]
+
+        # Generate JSON-LD Structured Data
+        if 'optimizer' in locals() and optimizer:
+            article_data_ld = {
+                "title": optimized_title,
+                "content": content[:500], # Pass valid text content, truncate for efficiency
+                "url": "", # Will be empty here, but WP adds it. Actually JSON-LD needs it. 
+                # Wait, we don't have the URL yet.
+                # However, the schema builder in seo_optimizer might need it. 
+                # Let's check create_json_ld implementation. It adds "url" if present.
+                # If we don't have it, we might be missing specific ID. 
+                # But we can generate the core schema.
+                # ACTUALLY, usually JSON-LD is generated dynamically by PHP on render, so it has the URL.
+                # BUT the instructions said "Generate JSON-LD... and save to WP".
+                # If we save strictly static JSON, the URL might be wrong if slug changes.
+                # BUT, `seo_optimizer.py` takes article_data.
+                # Plan: WE SAVE THE CORE DATA, PHP ADDS URL?
+                # OR, we generate it here with a placeholder?
+                # The user approved "Python side generates JSON-LD".
+                # Let's try to generate it. For URL, we can leave it blank or omit. 
+                # PHP side is responsible for final output?
+                # No, if we save the WHOLE BLOCK as `_finshift_json_ld`, PHP just echos it.
+                # That implies PHP can't inject URL easily unless it parses JSON.
+                # Let's check `seo_optimizer.py` again.
+                # It accepts `url` optional.
+                # If we omit URL here, Google might complain about missing ID or URL.
+                # SOLUTION: We pass the generated JSON-LD strings.
+                # And in `functions.php` we might need to str_replace placeholder or just rely on Page context?
+                # Actually, JSON-LD for Article doesn't strictly require URL if it's ON the page (implicit).
+                # Let's proceed with generating it without URL.
+                
+                "date_published": schedule_date if schedule_date else datetime.now().isoformat(),
+                "image_url": None # We don't have the featured image URL easily yet unless we uploaded it.
+            }
+            # Try to get image URL if we uploaded one
+            if featured_media_id:
+                # We need the source URL. `upload_media` returns it.
+                # Check where we uploaded hero.
+                pass 
+                # (Can't easily access previous scope var unless we refactor. 
+                # But notice `media_result` in uplod blocks. 
+                # We can grab it if we track it.)
+            
+            # Refined approach:
+            # We skip image_url in Python side if too complex, or we can try.
+            # Let's simple gen.
+            
+            # Determine Schema Type
+            # 'market-analysis' and 'news' should be 'NewsArticle'
+            schema_type = "Article"
+            if args.type in ['market-analysis', 'news', 'featured-news', 'global']:
+                schema_type = "NewsArticle"
+
+            json_ld_string = optimizer.create_json_ld(article_data_ld, schema_type=schema_type)
+            meta_fields["_finshift_json_ld"] = json_ld_string
+
+
 
         result = wp.create_post(
             title=optimized_title, 

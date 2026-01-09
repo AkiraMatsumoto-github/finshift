@@ -217,20 +217,25 @@ def phase_2_analysis(args):
             if not isinstance(scenarios, dict):
                 scenarios = {}
                 
+            main_cond = scenarios.get('main', {}).get('condition', 'N/A')
             bull_cond = scenarios.get('bull', {}).get('condition', 'N/A')
             bear_cond = scenarios.get('bear', {}).get('condition', 'N/A')
             
             prev_context_str = f"""
-            ## Yesterday's Analysis Context
+            ## Yesterday's Analysis Context (verification target)
             - Market Regime: {prev_analysis.get('market_regime')}
+            - Main Scenario (Base Case): {main_cond}
             - Bull Scenario: {bull_cond}
             - Bear Scenario: {bear_cond}
             """
+
         
         if args.dry_run:
             print(" [Dry-Run] Generating Analysis with Context...")
             print(f"   - Recent Events: {len(recent_events)} items")
             print(f"   - Prev Analysis: {'Available' if prev_analysis else 'None (404 expected if not deployed)'}")
+
+
 
         analysis = gemini.analyze_daily_market(
             news, 
@@ -402,8 +407,13 @@ def phase_2_analysis(args):
             
             if res:
                 print(f"Posted to WordPress (ID: {res.get('id')}). Status: {status}")
+                # Update DB with the public URL for future linking
+                if res.get('link'):
+                    db.update_daily_analysis_url(today_str, region, res.get('link'))
+                    print(f"Updated DB with Article URL: {res.get('link')}")
             else:
                 print("Failed to post to WordPress.")
+
         else:
             print(f"[Dry-Run] Would post: {title}")
             print(f"[Dry-Run] With Meta: {json.dumps(post_meta, ensure_ascii=False)}")
