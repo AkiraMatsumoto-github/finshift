@@ -1001,7 +1001,7 @@ class GeminiClient:
             print(f"Market analysis failed: {e}")
             return None
 
-    def write_briefing(self, analysis_result, region, context_news=None, market_data_str=None, events_str=None, date_str=None):
+    def write_briefing(self, analysis_result, region, context_news=None, market_data_str=None, events_str=None, date_str=None, internal_links_context=None):
         """
         [Daily Briefing Pipeline]
         Write the final Daily Briefing article in Markdown based on the analysis and raw context.
@@ -1028,6 +1028,9 @@ class GeminiClient:
         
         ### 4. Upcoming Events
         {events_str if events_str else "N/A"}
+
+        ### 5. Internal Link Candidates (Suggestion)
+        {internal_links_context if internal_links_context else "N/A"}
         
         ## Goal
         Create a **highly practical, data-dense, and readable** report for Swing Traders. 
@@ -1075,6 +1078,13 @@ class GeminiClient:
         6. **【投資戦略】 (Outlook)**
            - Conclude with clear stance: "押し目買い (Buy Dips)", "戻り売り (Sell Rallies)", "様子見 (Wait)".
            - Provide concrete "Risk Level" (Support/Resistance).
+
+        ## Internal Linking Instructions
+        - Use "Internal Link Candidates" (Input 5) if they are highly relevant to the context (e.g. "As detailed in [Title]...").
+        - **Format**: `[Title](URL)`
+        - **Prioritize**: Links that explain specific concepts, recent analyses, or related themes mentioned in your report.
+        - **Natural Integration**: Do not list them blindly. Integrate them into the text or put them as "Reference" at the end of relevant sections.
+        
         ## タイトル作成ルール
         1. **文字数**: 32文字程度（検索結果で省略されない長さ）
         2. **キーワード**: 「{region}市場」のような大きな単語は避け、「NVIDIA」「米雇用統計」「ドル円」など、その日最も注目された**具体的な固有名称**を主語にする。

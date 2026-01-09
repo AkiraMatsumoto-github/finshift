@@ -22,6 +22,7 @@ from automation.wp_client import WordPressClient
 from automation.collectors.collector import collect_articles
 from automation.collectors import market_data
 from automation.collectors import forex_factory
+from automation.internal_linker import InternalLinkSuggester
 
 def get_url_hash(url):
     return hashlib.sha256(url.encode('utf-8')).hexdigest()
@@ -251,6 +252,32 @@ def phase_2_analysis(args):
             
         print(f"Analysis Complete. Regime: {analysis.get('market_regime')}")
         
+        # 2.5 Internal Linking Suggestions
+        internal_links_context = ""
+        try:
+            print(">> Fetching Internal Link Suggestions...")
+            linker = InternalLinkSuggester(wp, gemini)
+            candidates = linker.fetch_candidates(limit=50)
+            
+            if candidates:
+                # Context for scoring: Region + Market Regime + Main Scenario
+                scen = analysis.get('scenarios', {}).get('main', {}).get('condition', '')
+                scoring_context = f"Region: {region}\nMarket Regime: {analysis.get('market_regime')}\nKey Topics: {scen}"
+                
+                relevant_links = linker.score_relevance(f"{region} Market Analysis", scoring_context, candidates)
+                
+                if relevant_links:
+                    print(f"   Found {len(relevant_links)} relevant articles.")
+                    # candidates are already sorted by relevance_score in score_relevance
+                    top_links = relevant_links[:5]
+                    
+                    for l in top_links:
+                        internal_links_context += f"- ID: {l['id']} | Title: {l['title']} | URL: {l['url']}\n"
+                else:
+                    print("   No relevant links found.")
+        except Exception as e:
+            print(f"   Internal Linking Warning: {e}")
+
         # 3. Write Briefing
         print("Writing Briefing...")
         article_md = gemini.write_briefing(
@@ -259,7 +286,8 @@ def phase_2_analysis(args):
             context_news=news, 
             market_data_str=market_data_str, 
             events_str=events_str,
-            date_str=today_str
+            date_str=today_str,
+            internal_links_context=internal_links_context
         )
 
         # SEO: Add Internal Link to Previous Analysis
