@@ -1177,9 +1177,9 @@ section {
 /* Header Section */
 .market-dashboard-page .market-header {
     background-color: #fff;
-    padding: var(--spacing-lg) 0;
+    padding: var(--spacing-md) 0;
     border-bottom: 1px solid var(--color-bg-tertiary);
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-md);
 }
 
 .market-dashboard-page .market-title-box {
@@ -1189,7 +1189,7 @@ section {
 }
 
 .market-dashboard-page .market-title {
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 800;
     margin: 0;
     color: var(--color-text-primary);
@@ -1273,15 +1273,15 @@ section {
 }
 
 .todays-scenarios-panel .scenario-label.bull {
-    background: linear-gradient(135deg, #22c55e, #16a34a);
+    background: #22c55e;
 }
 
 .todays-scenarios-panel .scenario-label.main {
-    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    background: #3b82f6;
 }
 
 .todays-scenarios-panel .scenario-label.bear {
-    background: linear-gradient(135deg, #ef4444, #dc2626);
+    background: #ef4444;
 }
 
 .todays-scenarios-panel .scenario-text {
@@ -1373,7 +1373,7 @@ section {
     border: 1px solid var(--color-bg-tertiary);
     border-radius: var(--radius-md);
     padding: var(--spacing-md);
-    margin-bottom: var(--spacing-xl);
+    margin-bottom: var(--spacing-2xl);
 }
 
 .metrics-scroller {
@@ -2713,4 +2713,43 @@ section {
 
 .dashboard-card:hover .read-briefing-text {
     color: var(--color-accent);
+}
+
+/* =========================================
+   Mobile Overrides: Scenario Panel Widen (No Card)
+   ========================================= */
+@media (max-width: 768px) {
+
+    /* Only target the scenarios panel as requested */
+    .todays-scenarios-panel {
+        background: transparent !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+
+        /* Widen to full screen (negate container padding) */
+        margin-left: -16px;
+        margin-right: -16px;
+        padding: 16px 16px;
+        /* Keep internal padding but edge-to-edge background if needed, here transparent so text is distinct */
+
+        /* Add top/bottom borders to separate from content */
+        border-top: 1px solid var(--color-bg-tertiary) !important;
+        border-bottom: 1px solid var(--color-bg-tertiary) !important;
+    }
+
+    .todays-scenarios-panel .panel-title {
+        padding-left: 0;
+        /* Align with text */
+        border-bottom: none;
+        /* Simplify title */
+        margin-bottom: 12px;
+    }
+
+    /* Make scenarios list cleaner */
+    .todays-scenarios-panel .scenario-row {
+        border-bottom: 1px solid var(--color-bg-secondary);
+        padding-bottom: 12px;
+        margin-bottom: 12px;
+    }
 }

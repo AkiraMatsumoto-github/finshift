@@ -136,8 +136,10 @@ if ( ! $region_tag_slug ) {
                     $bull_scen = get_post_meta( get_the_ID(), '_finshift_scenario_bull', true );
                     $bear_scen = get_post_meta( get_the_ID(), '_finshift_scenario_bear', true );
                     ?>
+                    <div class="section-header-styled">
+                        <h2 class="section-title">Today's Market Scenarios</h2>
+                    </div>
                     <div class="todays-scenarios-panel">
-                        <h3 class="panel-title">Today's Market Scenarios</h3>
                         <div class="scenario-row">
                             <span class="scenario-label bull">楽観</span>
                             <span class="scenario-text"><?php echo $bull_scen ? esc_html( $bull_scen ) : '強気シナリオ: 最新記事で詳細を確認してください。'; ?></span>
