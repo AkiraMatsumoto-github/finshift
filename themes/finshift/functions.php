@@ -207,8 +207,7 @@ function finshift_seo_meta() {
     <meta name="twitter:image" content="<?php echo esc_url( $image ); ?>">
     <?php
 }
-    <?php
-}
+
 
 /**
  * Conditionally load Theme SEO only if no SEO plugin is active.
