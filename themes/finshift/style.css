@@ -1276,12 +1276,16 @@ section {
     background: linear-gradient(135deg, #22c55e, #16a34a);
 }
 
+.todays-scenarios-panel .scenario-label.main {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
 .todays-scenarios-panel .scenario-label.bear {
     background: linear-gradient(135deg, #ef4444, #dc2626);
 }
 
 .todays-scenarios-panel .scenario-text {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: var(--color-text-primary);
     line-height: 1.6;
     font-weight: 500;
@@ -1316,6 +1320,33 @@ section {
     .market-content-grid {
         grid-template-columns: 1fr;
         /* Stack on mobile/tablet */
+    }
+}
+
+@media (max-width: 600px) {
+    .todays-scenarios-panel .scenario-row {
+        display: flex;
+        /* Keep flex but change direction */
+        flex-direction: column;
+        gap: 6px;
+        /* Small gap between label and text */
+        align-items: flex-start;
+    }
+
+    .todays-scenarios-panel .scenario-label {
+        float: none;
+        margin-right: 0;
+        margin-bottom: 0;
+        width: auto;
+        /* Allow auto width or keep fixed if desired, usually auto looks better in stack */
+        min-width: 60px;
+        /* Maintain min-width consistency */
+    }
+
+    .todays-scenarios-panel .scenario-text {
+        display: block;
+        padding-left: 2px;
+        /* Slight alignment adjustment */
     }
 }
 

@@ -940,13 +940,19 @@ class GeminiClient:
         2. **Sentiment Score**: 0 (Extreme Fear) to 100 (Extreme Greed).
         3. **Primary Driver**: What single factor is driving prices today?
            - **Consistency Check**: Reference the "Context & Continuity" section. Did yesterday's Bull/Bear scenario play out? Did recent economic results match forecasts? Explicitly mention this in your reasoning/driver logic if relevant.
-        4. **Scenarios**:
-           - **Bull Case**: Specific condition for upside. Write in **Japanese**. MUST include the RESULT/TARGET PRICE. format: "Condition -> Result".
-           - **Bear Case**: Specific condition for downside. Write in **Japanese**. MUST include the RESULT/TARGET PRICE. format: "Condition -> Result".
+        4. **Reflect on Previous Scenarios**: Reference the "Context & Continuity" section. Did yesterday's Bull/Bear scenario play out?
+           - If yes, why?
+           - If no, what unexpected factor intervened?
+        5. **Scenarios**:
+           - **Main Scenario (Base Case)**: The most likely outcome. Write in **Japanese**. **Format**: "Condition -> Result (Specific Marker Change)". Example: "US CPI matches expectation -> S&P500 maintains 6000 level / USDJPY stays at 155".
+           - **Bull Case**: Condition for upside. Write in **Japanese**. **Format**: "Condition -> Result (Specific Marker Change)". Example: "Job data cools -> Yields drop to 4.2%, S&P500 rises to 6050".
+           - **Bear Case**: Condition for downside. Write in **Japanese**. **Format**: "Condition -> Result (Specific Marker Change)". Example: "Inflation spike -> Yields jump to 4.5%, S&P500 falls below 5900".
+           - **Probability Requirement**: Assign a percentage probability (e.g. "60%", "20%", "20%") to Main, Bull, and Bear scenarios. **The sum MUST be 100%.**
+           - **Mid-term Outlook (1-2 weeks)**: General trend and key events.
         
-        5. **AI Structured Summary**:
-           - **summary**: A concise summary (max 200 chars).
-           - **key_topics**: List of 3-5 key entities.
+        6. **AI Structured Summary**:
+           - **summary**: A concise summary (max 200 chars) in **Japanese**.
+           - **key_topics**: List of 3-5 key entities in **Japanese**.
 
         ## Output JSON
         {{
@@ -955,8 +961,15 @@ class GeminiClient:
             "sentiment_label": "Greed",
             "primary_driver": "...",
             "scenarios": {{
-                "bull": {{ "condition": "...", "probability": "Low/Medium/High" }},
-                "bear": {{ "condition": "...", "probability": "Low/Medium/High" }}
+                "review": "Verification of yesterday's scenario. e.g., 'Yesterday's Bull case was realized due to...'",
+                "main": {{ "condition": "...", "probability": "60%", "target": "..." }},
+                "bull": {{ "condition": "...", "probability": "20%", "target": "..." }},
+                "bear": {{ "condition": "...", "probability": "20%", "target": "..." }},
+                "mid_term": {{ 
+                    "view": "Bullish/Neutral/Bearish", 
+                    "events": "FOMC (Day X), Earnings (Company Y)", 
+                    "risk": "Inflation data..." 
+                }}
             }},
             "ai_structured_summary": {{
                 "summary": "...",
@@ -1035,6 +1048,7 @@ class GeminiClient:
            - Analyze the primary driver. Connect it to asset moves.
            - *Must* cite specific news or data points from Input.
            - Explain the mechanism.
+           - **Scenario Continuity**: Briefly mention if yesterday's scenario played out (Reference `scenarios.review` from Input 1).
         
         4. **【注目アセット】 (Asset Watch)**
            - Markdown table summarizing key asset moves.
@@ -1043,15 +1057,15 @@ class GeminiClient:
         
         5. **【シナリオ分析】 (Scenarios)**
            - **短期シナリオ (Short-term: 24-48h)**:
-             - **メイン (Main)**: Most likely path. (Probability %)
-             - **アップサイド (Bull)**: Trigger & Target.
-             - **ダウンサイド (Bear)**: Trigger & Risk level.
+             - **メイン (Main)**: Most likely path. (from `scenarios.main`)
+             - **アップサイド (Bull)**: Trigger & Target. (from `scenarios.bull`)
+             - **ダウンサイド (Bear)**: Trigger & Risk level. (from `scenarios.bear`)
              - **着目イベント**: Specific economic indicator or event to watch in the next 48h.
            
            - **中期シナリオ (Mid-term: 1-2 Weeks)**:
-             - **見通し**: Bullish/Neutral/Bearish.
-             - **重要イベント**: Upcoming key events (e.g. FOMC, Earnings) that will define this trend.
-             - **リスク**: What could derail the trend?
+             - **見通し**: Bullish/Neutral/Bearish. (from `scenarios.mid_term.view`)
+             - **重要イベント**: Upcoming key events (e.g. FOMC, Earnings). (from `scenarios.mid_term.events`)
+             - **リスク**: What could derail the trend? (from `scenarios.mid_term.risk`)
         
         6. **【投資戦略】 (Outlook)**
            - Conclude with clear stance: "押し目買い (Buy Dips)", "戻り売り (Sell Rallies)", "様子見 (Wait)".

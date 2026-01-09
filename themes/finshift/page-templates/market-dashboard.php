@@ -132,6 +132,7 @@ if ( ! $region_tag_slug ) {
                 
                 if ( $latest_briefing_query->have_posts() ) :
                     $latest_briefing_query->the_post();
+                    $main_scen = get_post_meta( get_the_ID(), '_finshift_scenario_main', true );
                     $bull_scen = get_post_meta( get_the_ID(), '_finshift_scenario_bull', true );
                     $bear_scen = get_post_meta( get_the_ID(), '_finshift_scenario_bear', true );
                     ?>
@@ -141,6 +142,12 @@ if ( ! $region_tag_slug ) {
                             <span class="scenario-label bull">楽観</span>
                             <span class="scenario-text"><?php echo $bull_scen ? esc_html( $bull_scen ) : '強気シナリオ: 最新記事で詳細を確認してください。'; ?></span>
                         </div>
+                        <?php if ( $main_scen ) : ?>
+                        <div class="scenario-row">
+                            <span class="scenario-label main">メイン</span>
+                            <span class="scenario-text"><?php echo esc_html( $main_scen ); ?></span>
+                        </div>
+                        <?php endif; ?>
                         <div class="scenario-row">
                             <span class="scenario-label bear">悲観</span>
                             <span class="scenario-text"><?php echo $bear_scen ? esc_html( $bear_scen ) : '弱気シナリオ: リスク要因と警戒ラインを確認してください。'; ?></span>

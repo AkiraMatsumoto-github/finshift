@@ -32,6 +32,7 @@ function finshift_register_post_meta_rest_fields() {
 
     // 4. Article Scenarios (Bull/Bear)
     $scenario_keys = [
+        '_finshift_scenario_main',
         '_finshift_scenario_bull',
         '_finshift_scenario_bear'
     ];

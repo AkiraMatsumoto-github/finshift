@@ -213,11 +213,18 @@ def phase_2_analysis(args):
         # Format Previous Analysis Context
         prev_context_str = ""
         if prev_analysis:
+            scenarios = prev_analysis.get('scenarios')
+            if not isinstance(scenarios, dict):
+                scenarios = {}
+                
+            bull_cond = scenarios.get('bull', {}).get('condition', 'N/A')
+            bear_cond = scenarios.get('bear', {}).get('condition', 'N/A')
+            
             prev_context_str = f"""
             ## Yesterday's Analysis Context
             - Market Regime: {prev_analysis.get('market_regime')}
-            - Bull Scenario: {prev_analysis.get('scenarios', {}).get('bull', {}).get('condition')}
-            - Bear Scenario: {prev_analysis.get('scenarios', {}).get('bear', {}).get('condition')}
+            - Bull Scenario: {bull_cond}
+            - Bear Scenario: {bear_cond}
             """
         
         if args.dry_run:
@@ -361,10 +368,12 @@ def phase_2_analysis(args):
         # Prepare Post Meta regardless of dry-run for verification
         # Extract Scenarios
         scenarios = analysis.get("scenarios", {})
+        main_data = scenarios.get("main", {})
         bull_data = scenarios.get("bull", {})
         bear_data = scenarios.get("bear", {})
         
         # Format Scenarios with Probability
+        main_text = f"[{main_data.get('probability', 'Unknown')}] {main_data.get('condition', '')}"
         bull_text = f"[{bull_data.get('probability', 'Unknown')}] {bull_data.get('condition', '')}"
         bear_text = f"[{bear_data.get('probability', 'Unknown')}] {bear_data.get('condition', '')}"
 
@@ -374,6 +383,7 @@ def phase_2_analysis(args):
         post_meta = {
             "_finshift_sentiment": analysis.get("sentiment_score"),
             "_finshift_regime": analysis.get("market_regime"),
+            "_finshift_scenario_main": main_text,
             "_finshift_scenario_bull": bull_text,
             "_finshift_scenario_bear": bear_text,
             "_ai_structured_summary": json.dumps(ai_structured_summary, ensure_ascii=False)

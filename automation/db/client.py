@@ -175,7 +175,11 @@ class DBClient:
         try:
             res = self._get("daily-analysis", {"region": region, "limit": 1})
             if res:
-                return res
+                if isinstance(res, list) and len(res) > 0:
+                    return res[0]
+                elif isinstance(res, dict):
+                    return res
+                return None
         except requests.exceptions.RequestException as e:
             # 404 means endpoint might be missing or no data if designed that way (though usually returns empty list)
             # If endpoint missing, we just skip context.

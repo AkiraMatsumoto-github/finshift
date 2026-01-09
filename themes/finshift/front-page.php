@@ -105,7 +105,7 @@ get_header();
 				// Fetch Latest Market Analysis (Regardless of Region)
 				$dashboard_query = new WP_Query([
 					'category_name' => 'market-analysis',
-					'posts_per_page' => 3, // Show more
+					'posts_per_page' => 4, // Show more
 					'orderby' => 'date',
 					'order' => 'DESC'
 				]);
